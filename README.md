@@ -1,4 +1,4 @@
 mc-scatter
 ==========
 
-Monte carlo scatter light code
+Monte carlo scatter light code - documentation to follow
