@@ -69,8 +69,8 @@ int main(int argc, char *argv[]){
 						p_peel.update();
 					}
 					double weight = exp(-1*p_peel.get_tau_cur());
-					double ximage = p_peel.pos[0]*cos(theta)*cos(phi) + p_peel.pos[1]*cos(theta)*sin(phi) - p_peel.pos[2]*sin(theta);
-					double yimage = p_peel.pos[1]*cos(phi) - p_peel.pos[0]*sin(phi);
+					double ximage = -1*p_peel.pos[0]*sin(theta) + p_peel.pos[1]*cos(theta);
+					double yimage = -1*p_peel.pos[0]*cos(theta)*sin(phi) - p_peel.pos[1]*sin(theta)*sin(phi) + p_peel.pos[2]*cos(phi);
 				
 					(*img).add(ximage, yimage, weight);
 				}
