@@ -31,7 +31,6 @@ extern void init_grid();
 extern void init_usr();
 extern void init_text();
 extern Photon generate_photon();
-extern void add_to_image(double x, double y, double weight);
 extern double rand_double();
 extern double toRad(double angle);
 
@@ -69,10 +68,8 @@ int main(int argc, char *argv[]){
 						p_peel.update();
 					}
 					double weight = exp(-1*p_peel.get_tau_cur());
-					double ximage = -1*p_peel.pos[0]*sin(theta) + p_peel.pos[1]*cos(theta);
-					double yimage = -1*p_peel.pos[0]*cos(theta)*sin(phi) - p_peel.pos[1]*sin(theta)*sin(phi) + p_peel.pos[2]*cos(phi);
 				
-					(*img).add(ximage, yimage, weight);
+					(*img).add(p_peel.pos[0], p_peel.pos[1], p_peel.pos[2], weight);
 				}
 			}
 		}

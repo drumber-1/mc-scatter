@@ -66,11 +66,15 @@ string Image::construct_filename(bool global){
 	return filename;
 }
 
-void Image::add(double x, double y, double weight){
-	int i = (x - image_left[0])/image_pixel_spacing[0];
-	int j = (y - image_left[1])/image_pixel_spacing[1];
+void Image::add(double x, double y, double z, double weight){
+
+	double ximage = -1*x*sin(obs_theta) + y*cos(obs_theta);
+	double yimage = -1*x*cos(obs_theta)*sin(obs_phi) - y*sin(obs_theta)*sin(obs_phi) + z*cos(obs_phi);
+
+	int i = (ximage - image_left[0])/image_pixel_spacing[0];
+	int j = (yimage - image_left[1])/image_pixel_spacing[1];
 	
-	//Check if inside of image, could work this out earlier to save time
+	//Check if inside of image
 	if(i >= 0 && i < image_npixels[0] && j >= 0 && j < image_npixels[1]){
 		image[i][j] += weight;
 	}

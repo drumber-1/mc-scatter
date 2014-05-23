@@ -11,7 +11,7 @@ class Image {
 	public:
 		Image (double, double, int, int);
 		Image (double, double, int);
-		void add(double, double, double);
+		void add(double, double, double, double);
 		void output_global_image();
 		void output_local_image();
 		double get_theta();
