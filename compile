@@ -17,7 +17,7 @@ else
 			endif
 		endif
 
-		if (-f $mg/src/prob.h) then
+		if (-f ./prob.h) then
 			diff --brief ./problems/$1/prob.h ./prob.h > ./dump
 			if($status) then
 				echo "copying prob.h"
