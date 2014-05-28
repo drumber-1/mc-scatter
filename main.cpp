@@ -12,7 +12,6 @@
 #include "grid.h"
 #include "photon.h"
 #include "image.h"
-#include "text.h"
 
 #undef MAIN
 
@@ -94,7 +93,6 @@ void init(int argc, char *argv[]){ //Order of init calls is important!
 	init_random();
 	
 	set_defaults();
-	Text::init_freetype();
 	
 	init_usr();
 	
