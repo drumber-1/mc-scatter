@@ -9,7 +9,8 @@ class Photon {
 	public:
 		double pos[3];
 		int nScatt;
-		bool absorbed, escaped, is_peel, scattered;
+		bool absorbed, escaped, scattered;
+		bool is_scan; //A scanning photon will never interact
 		Photon(double, double, double);
 		Photon(double, double, double, double, double, bool);
 		void update();

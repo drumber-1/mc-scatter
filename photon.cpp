@@ -21,16 +21,16 @@ Photon::Photon(double x, double y, double z){
 	init(x, y, z, theta, phi, false);
 }
 
-Photon::Photon(double x, double y, double z, double ang1, double ang2, bool p){
-	init(x, y, z, ang1, ang2, p);
+Photon::Photon(double x, double y, double z, double ang1, double ang2, bool scan){
+	init(x, y, z, ang1, ang2, scan);
 }
 
-void Photon::init(double x, double y, double z, double ang1, double ang2, bool p){
+void Photon::init(double x, double y, double z, double ang1, double ang2, bool scan){
 	pos[0] = x;
 	pos[1] = y;
 	pos[2] = z;
 	nScatt = 0;
-	if(p){
+	if(scan){
 		tau_target = 1.0e99;
 	} else {
 		tau_target = rand_tau();
@@ -38,7 +38,7 @@ void Photon::init(double x, double y, double z, double ang1, double ang2, bool p
 	tau_cur = 0.0;
 	absorbed = false;
 	escaped = false;
-	is_peel = p;
+	is_scan = scan;
 	
 	dir[0] = sin(ang1)*cos(ang2);
 	dir[1] = sin(ang1)*sin(ang2);
@@ -106,7 +106,7 @@ void Photon::update(){
 	double dtau = rho*opacity*next_face_dist_min;
 	
 	
-	if(dtau + tau_cur > tau_target && !is_peel){ //Going to interact in this cell
+	if(dtau + tau_cur > tau_target && !is_scan){ //Going to interact in this cell
 		double ds = next_face_dist_min*(tau_target - tau_cur)/(dtau);
 		move(ds);
 		interact();
