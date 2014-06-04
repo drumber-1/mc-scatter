@@ -23,11 +23,6 @@ Image::Image(double theta, double phi, int nxy){
 }
 
 Image::~Image(){
-	for(int i = 0; i < image_npixels[0]; i++){
-		delete[] image[i];
-	}
-	
-	delete[] image;
 }
 
 void Image::init(double theta, double phi, int nx, int ny){
