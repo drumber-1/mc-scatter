@@ -28,8 +28,8 @@ void init_usr(){
 		grid_right[i] = 2;
 	}
 	
-	make_image = true;
-	sub_image = false; //Whether to output image data from each processor
+	make_scatter_image = true;
+	sub_scatter_image = false; //Whether to output image data from each processor
 	
 	Image im (toRad(0.0), toRad(0.0), 100);
 	images.push_back(im);

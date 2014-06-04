@@ -41,7 +41,7 @@ void Image::init(double theta, double phi, int nx, int ny){
 		image_pixel_spacing[i] = (image_right[i] - image_left[i])/image_npixels[i];
 	}
 		
-	if(make_image){
+	if(make_scatter_image){
 		image = new double *[image_npixels[0]];
 	
 		for(int i = 0; i < image_npixels[0]; i++){
@@ -82,52 +82,48 @@ void Image::add(double x, double y, double z, double weight){
 
 //TODO Add header
 void Image::output_global_image(){
-	if(make_image){
 		
-		// Create global image
-		double g_image[image_npixels[0]][image_npixels[1]];
+	// Create global image
+	double g_image[image_npixels[0]][image_npixels[1]];
 		
-		//Could be reduced to a single MPI_Reduce call to improve speed if needed
-		for(int i = 0; i < image_npixels[0]; i++){
-			MPI_Reduce(image[i], g_image[i], image_npixels[1], MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-		}
-		
-		if(procRank == 0) {
-			ofstream fout;
-			string fname = construct_filename(true);
-			fout.open(fname.c_str());
-			if(fout.good()) {
-				for(int i = 0; i < image_npixels[0]; i++){
-					for(int j = 0; j < image_npixels[1]; j++){
-						fout << i << "\t" << j << "\t" << g_image[i][j] << endl;
-					}
-				}
-				fout.close();
-			} else {
-				cerr << "Could not open output file" << endl;
-			}
-		}
-		
+	//Could be reduced to a single MPI_Reduce call to improve speed if needed
+	for(int i = 0; i < image_npixels[0]; i++){
+		MPI_Reduce(image[i], g_image[i], image_npixels[1], MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 	}
-}
-
-void Image::output_local_image(){
-	if(sub_image){
+	
+	if(procRank == 0) {
 		ofstream fout;
-		string fname = construct_filename(false);
-			
+		string fname = construct_filename(true);
 		fout.open(fname.c_str());
 		if(fout.good()) {
 			for(int i = 0; i < image_npixels[0]; i++){
 				for(int j = 0; j < image_npixels[1]; j++){
-					fout << i << "\t" << j << "\t" << image[i][j] << endl;
-				}				
+					fout << i << "\t" << j << "\t" << g_image[i][j] << endl;
+				}
 			}
 			fout.close();
 		} else {
-			cerr << "Could not open output file " << fname << endl;
-		}		
+			cerr << "Could not open output file" << endl;
+		}
 	}
+	
+}
+
+void Image::output_local_image(){
+	ofstream fout;
+	string fname = construct_filename(false);
+			
+	fout.open(fname.c_str());
+	if(fout.good()) {
+		for(int i = 0; i < image_npixels[0]; i++){
+			for(int j = 0; j < image_npixels[1]; j++){
+				fout << i << "\t" << j << "\t" << image[i][j] << endl;
+			}				
+		}
+		fout.close();
+	} else {
+		cerr << "Could not open output file " << fname << endl;
+	}		
 }
 
 double Image::get_theta(){

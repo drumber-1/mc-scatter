@@ -37,8 +37,10 @@ extern double toRad(double angle);
 int main(int argc, char *argv[]){
 
 	init(argc, argv);
-
-	run_scatter_simulation(NSAMPLES/procSize);
+	
+	if(make_scatter_image){
+		run_scatter_simulation(NSAMPLES/procSize);
+	}
 
 	dispose();
 	return 0;
@@ -65,8 +67,8 @@ void set_defaults(){
 		grid_right[i] = 10;
 	}
 	
-	make_image = true;
-	sub_image = false; //Whether to output image data from each processor
+	make_scatter_image = true;
+	sub_scatter_image = false; //Whether to output image data from each processor
 }
 
 void run_scatter_simulation(int nPhotons){
@@ -89,8 +91,7 @@ void run_scatter_simulation(int nPhotons){
 				break;
 			}
 			
-			if(make_image && p.scattered){ //Peel of a photon
-			
+			if(p.scattered){ //Peel of a photon
 				for(list<Image>::iterator img = images.begin(); img != images.end(); img++){
 					double theta = (*img).get_theta();
 					double phi = (*img).get_phi();
@@ -99,7 +100,6 @@ void run_scatter_simulation(int nPhotons){
 						p_peel.update();
 					}
 					double weight = exp(-1*p_peel.get_tau_cur());
-				
 					(*img).add(p_peel.pos[0], p_peel.pos[1], p_peel.pos[2], weight);
 				}
 			}
@@ -108,12 +108,10 @@ void run_scatter_simulation(int nPhotons){
 	} //Photons
 	
 	for(list<Image>::iterator img = images.begin(); img != images.end(); img++){
-		if(make_image){
-			if(sub_image){
-				(*img).output_local_image();
-			}
-			(*img).output_global_image();
+		if(sub_scatter_image){
+			(*img).output_local_image();
 		}
+		(*img).output_global_image();
 	}
 }
 

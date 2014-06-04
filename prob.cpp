@@ -1,7 +1,6 @@
 #include <iostream>
 #include <cmath>
 #include <list>
-
 #include "param.h"
 #include "grid.h"
 #include "image.h"
@@ -29,42 +28,22 @@ void init_usr(){
 		grid_right[i] = 2;
 	}
 	
-	make_image = true;
-	sub_image = false; //Whether to output image data from each processor
+	make_scatter_image = true;
+	sub_scatter_image = false; //Whether to output image data from each processor
 	
-	//Image im1 (toRad(0.0), toRad(0.0), 100);
-	//images.push_back(im1);
-	
-	for(int i = 0; i < 60; i ++){
-		Image im (toRad(0.0), toRad(i*3.0), 500);
-		images.push_back(im);
-	}
-	
-	/*for(list<Image>::iterator img = images.begin(); img != images.end(); img++){
-		if(procRank == 0){
-			(*img).print_info();
-		}
-	}*/
-	
-	text = Text("?", 256);
-	text.generate_pixmap();
+	Image im (toRad(0.0), toRad(0.0), 100);
+	images.push_back(im);
+
 }
 
 double setup_density(double x, double y, double z){
-	double pix_size = 0.5*(grid_right[0] - grid_left[1])/text.width;
+	double r2 = x*x + y*y + z*z;
 	
-	int pix_val = text.get_pixel((y - grid_left[1]/2.0)/pix_size,(x - grid_left[1])/pix_size);
-	double rho = 0.0001;
-	
-	if(abs(z) < 0.5){
-		if(pix_val == 0){
-			rho = 0.0001;
-		} else {
-			rho = pix_val/255.0;
-		}
+	if(r2 < 1){
+		return 5.0;
+	} else {
+		return 0.0001;
 	}
-	
-	return rho;
 }
 
 Photon generate_photon(){

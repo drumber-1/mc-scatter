@@ -20,11 +20,11 @@ class Image {
 };
 
 #ifdef IMAGE
-bool make_image, sub_image;
+bool make_scatter_image, sub_scatter_image;
 int nimages = 0; //Number of images defined, used to give each image a unique id
 std::list<Image> images;
 #else
-extern bool make_image, sub_image;
+extern bool make_scatter_image, sub_scatter_image;
 extern std::list<Image> images;
 #endif
 
