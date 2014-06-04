@@ -33,6 +33,7 @@ void init_usr(){
 	
 	Image im (toRad(0.0), toRad(0.0), 100);
 	scatter_images.push_back(im);
+	colden_images.push_back(im);
 
 }
 

@@ -19,7 +19,8 @@ using namespace std;
 
 void init(int argc, char *argv[]);
 void set_defaults();
-void run_scatter_simulation(int nPhotons);
+void do_scatter_simulation(int nPhotons);
+void do_colden_calculation();
 void dispose(); //Exit safely, as success
 void term(); //Exit safely, as failure
 
@@ -39,7 +40,11 @@ int main(int argc, char *argv[]){
 	init(argc, argv);
 	
 	if(make_scatter_image){
-		run_scatter_simulation(NSAMPLES/procSize);
+		do_scatter_simulation(NSAMPLES/procSize);
+	}
+	
+	if(make_colden_image){
+		do_colden_calculation();
 	}
 
 	dispose();
@@ -69,9 +74,11 @@ void set_defaults(){
 	
 	make_scatter_image = true;
 	sub_scatter_image = false; //Whether to output image data from each processor
+	
+	make_colden_image = true;
 }
 
-void run_scatter_simulation(int nPhotons){
+void do_scatter_simulation(int nPhotons){
 	
 	int print_step = nPhotons/5;
 
@@ -111,6 +118,15 @@ void run_scatter_simulation(int nPhotons){
 		if(sub_scatter_image){
 			(*img).output_local_image();
 		}
+		(*img).output_global_image();
+	}
+}
+
+void do_colden_calculation(){
+	
+	//Column density calculations
+	
+	for(list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
 		(*img).output_global_image();
 	}
 }
