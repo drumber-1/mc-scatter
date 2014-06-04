@@ -33,19 +33,11 @@ void init_usr(){
 	make_scatter_image = true;
 	sub_scatter_image = false; //Whether to output image data from each processor
 	
-	//Image im (toRad(90.0), toRad(0.0), 200);
-	//images.push_back(im);
-	
 	for(int i = 0; i < 60; i ++){
 		Image im (toRad(90.0), toRad(i*6.0), 500);
-		images.push_back(im);
+		scatter_images.push_back(im);
 	}
 	
-	/*for(list<Image>::iterator img = images.begin(); img != images.end(); img++){
-		if(procRank == 0){
-			(*img).print_info();
-		}
-	}*/
 }
 
 double setup_density(double x, double y, double z){

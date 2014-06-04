@@ -92,7 +92,7 @@ void run_scatter_simulation(int nPhotons){
 			}
 			
 			if(p.scattered){ //Peel of a photon
-				for(list<Image>::iterator img = images.begin(); img != images.end(); img++){
+				for(list<Image>::iterator img = scatter_images.begin(); img != scatter_images.end(); img++){
 					double theta = (*img).get_theta();
 					double phi = (*img).get_phi();
 					Photon p_peel = p.peel(theta, phi);
@@ -107,7 +107,7 @@ void run_scatter_simulation(int nPhotons){
 		
 	} //Photons
 	
-	for(list<Image>::iterator img = images.begin(); img != images.end(); img++){
+	for(list<Image>::iterator img = scatter_images.begin(); img != scatter_images.end(); img++){
 		if(sub_scatter_image){
 			(*img).output_local_image();
 		}

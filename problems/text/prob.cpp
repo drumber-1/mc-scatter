@@ -32,19 +32,10 @@ void init_usr(){
 	make_scatter_image = true;
 	sub_scatter_image = false; //Whether to output image data from each processor
 	
-	//Image im1 (toRad(0.0), toRad(0.0), 100);
-	//images.push_back(im1);
-	
 	for(int i = 0; i < 60; i ++){
 		Image im (toRad(0.0), toRad(i*3.0), 500);
-		images.push_back(im);
+		scatter_images.push_back(im);
 	}
-	
-	/*for(list<Image>::iterator img = images.begin(); img != images.end(); img++){
-		if(procRank == 0){
-			(*img).print_info();
-		}
-	}*/
 	
 	text = Text("?", 256);
 	text.generate_pixmap();
