@@ -17,6 +17,10 @@ class Image {
 		void output_local_image();
 		double get_theta();
 		double get_phi();
+		double get_left_bound(int);
+		double get_right_bound(int);
+		double get_spacing(int);
+		int get_npixels(int);
 		void print_info();
 };
 

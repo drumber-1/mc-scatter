@@ -6,7 +6,6 @@
 #include <sstream>
 #include <cmath>
 #include <string>
-#include <mpi.h>
 #include "param.h"
 #include "para.h"
 #include "grid.h"
@@ -34,16 +33,23 @@ extern void init_text();
 extern Photon generate_photon();
 extern double rand_double();
 extern double toRad(double angle);
+extern double get_rho(double x, double y, double z);
 
 int main(int argc, char *argv[]){
 
 	init(argc, argv);
 	
 	if(make_scatter_image){
+		if(procRank == 0){
+			cout << "Starting scattering simluation" << endl;
+		}
 		do_scatter_simulation(NSAMPLES/procSize);
 	}
 	
 	if(make_colden_image){
+		if(procRank == 0) {
+			cout << "Calculating column densities" << endl;
+		}
 		do_colden_calculation();
 	}
 
@@ -125,6 +131,44 @@ void do_scatter_simulation(int nPhotons){
 void do_colden_calculation(){
 	
 	//Column density calculations
+	for(list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
+		for(int i = 0; i < (*img).get_npixels(0); i++){
+			for(int j = 0; j < (*img).get_npixels(1); j++){
+				double ximage = (*img).get_left_bound(0) + (double)i*(*img).get_spacing(0);
+				double yimage = (*img).get_left_bound(1) + (double)j*(*img).get_spacing(1);
+				//Assume zimage = 0
+				
+				double theta = (*img).get_theta();
+				double phi = (*img).get_phi();
+				
+				//Instead of trying to find the edge of the grid, for each point
+				// we will fire two photons, on in each direction from the centre
+				
+				//I think this is right
+				//double x = ximage*sin(theta) + yimage*cos(theta);
+				//double y = ximage*cos(theta)*sin(phi) - yimage*sin(theta)*sin(phi);
+				//double z = ximage*cos(theta)*cos(phi) - yimage*sin(theta)*cos(phi);
+				
+				double x = ximage;
+				double y = yimage;
+				double z = 0.0;
+				
+				Photon p1 (x, y, z, theta, phi, true);
+				while(!p1.escaped){
+					p1.update();
+				}
+				double colden = p1.get_tau_cur();
+				
+				Photon p2 (x, y, z, 2*M_PI*theta, -1*phi, true);
+				while(!p2.escaped){
+					p2.update();
+				}
+				colden += p2.get_tau_cur();
+				(*img).add(x, y, z, colden);
+			}				
+		}
+		
+	}
 	
 	for(list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
 		(*img).output_global_image();

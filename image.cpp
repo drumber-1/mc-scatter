@@ -141,6 +141,22 @@ double Image::get_phi(){
 	return obs_phi;
 }
 
+double Image::get_left_bound(int dim){
+	return image_left[dim];
+}
+
+double Image::get_right_bound(int dim){
+	return image_right[dim];
+}
+
+double Image::get_spacing(int dim){
+	return image_pixel_spacing[dim];
+}
+
+int Image::get_npixels(int dim){
+	return image_npixels[dim];
+}
+
 void Image::print_info(){
 	cout << "Image id: " << id << endl;
 }
