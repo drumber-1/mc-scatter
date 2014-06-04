@@ -19,6 +19,7 @@ using namespace std;
 
 void init(int argc, char *argv[]);
 void set_defaults();
+void run_scatter_simulation(int nPhotons);
 void dispose(); //Exit safely, as success
 void term(); //Exit safely, as failure
 
@@ -36,8 +37,39 @@ extern double toRad(double angle);
 int main(int argc, char *argv[]){
 
 	init(argc, argv);
+
+	run_scatter_simulation(NSAMPLES/procSize);
+
+	dispose();
+	return 0;
+}
+
+void init(int argc, char *argv[]){ //Order of init calls is important!
+	init_para(argc, argv);
+	init_random();
 	
-	int nPhotons = NSAMPLES/procSize;
+	set_defaults();
+	
+	init_usr();
+	
+	init_grid();
+}
+
+void set_defaults(){
+	albedo = 1.0;
+	opacity = 1.0;
+	
+	for(int i = 0; i < 3; i++){
+		grid_ncells[i] = 100;
+		grid_left[i] = -10;
+		grid_right[i] = 10;
+	}
+	
+	make_image = true;
+	sub_image = false; //Whether to output image data from each processor
+}
+
+void run_scatter_simulation(int nPhotons){
 	
 	int print_step = nPhotons/5;
 
@@ -83,34 +115,6 @@ int main(int argc, char *argv[]){
 			(*img).output_global_image();
 		}
 	}
-
-	dispose();
-	return 0;
-}
-
-void init(int argc, char *argv[]){ //Order of init calls is important!
-	init_para(argc, argv);
-	init_random();
-	
-	set_defaults();
-	
-	init_usr();
-	
-	init_grid();
-}
-
-void set_defaults(){
-	albedo = 1.0;
-	opacity = 1.0;
-	
-	for(int i = 0; i < 3; i++){
-		grid_ncells[i] = 100;
-		grid_left[i] = -10;
-		grid_right[i] = 10;
-	}
-	
-	make_image = true;
-	sub_image = false; //Whether to output image data from each processor
 }
 
 void dispose(){
