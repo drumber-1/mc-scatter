@@ -22,6 +22,14 @@ Image::Image(double theta, double phi, int nxy){
 	init(theta, phi, nxy, nxy);
 }
 
+Image::~Image(){
+	for(int i = 0; i < image_npixels[0]; i++){
+		delete[] image[i];
+	}
+	
+	delete[] image;
+}
+
 void Image::init(double theta, double phi, int nx, int ny){
 	
 	id = nimages;
@@ -41,19 +49,18 @@ void Image::init(double theta, double phi, int nx, int ny){
 		image_pixel_spacing[i] = (image_right[i] - image_left[i])/image_npixels[i];
 	}
 		
-	if(make_scatter_image){
-		image = new double *[image_npixels[0]];
+	image = new double *[image_npixels[0]];
 	
-		for(int i = 0; i < image_npixels[0]; i++){
-			image[i] = new double [image_npixels[1]];
-		}
+	for(int i = 0; i < image_npixels[0]; i++){
+		image[i] = new double [image_npixels[1]];
+	}
 	
-		for(int i = 0; i < image_npixels[0]; i++){
-			for(int j = 0; j < image_npixels[1]; j++){
-				image[i][j] = 0.0;
-			}
+	for(int i = 0; i < image_npixels[0]; i++){
+		for(int j = 0; j < image_npixels[1]; j++){
+			image[i][j] = 0.0;
 		}
 	}
+	
 }
 
 string Image::construct_filename(bool global){
