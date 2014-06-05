@@ -38,11 +38,20 @@ void init_grid(){
 }
 
 double get_rho(double x, double y, double z){ //Return density given a physical position
-	int i = (x - grid_left[0])/grid_space[0];
-	int j = (y - grid_left[1])/grid_space[1];
-	int k = (z - grid_left[2])/grid_space[2];
+	int cell[3];
+	cell[0] = (x - grid_left[0])/grid_space[0];
+	cell[1] = (y - grid_left[1])/grid_space[1];
+	cell[2] = (z - grid_left[2])/grid_space[2];
+
+	for(int i = 0; i < 3; i++){
+		if(cell[i] < 0){
+			cell[i] = 0;
+		} else if(cell[i] >= grid_ncells[i]){
+			cell[i] = grid_ncells[i] - 1;
+		}
+	}
 	
-	return rhoData[i][j][k];
+	return rhoData[cell[0]][cell[1]][cell[2]];
 }
 
 
