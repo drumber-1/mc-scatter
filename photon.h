@@ -1,5 +1,7 @@
+#include <vector>
+
 class Photon {
-		double dir[3]; //Normalized direction vectors
+		std::vector<double> dir; //Normalized direction vectors
 		double tau_target; //Total optical depth this photon will travel before interacting
 		double tau_cur; //Total integrated optical depth so far
 		void move(double);
@@ -7,7 +9,7 @@ class Photon {
 		void scatter();
 		void init(double, double, double, double, double, bool);
 	public:
-		double pos[3];
+		std::vector<double> pos;
 		int nScatt;
 		bool absorbed, escaped, scattered;
 		bool is_scan; //A scanning photon will never interact

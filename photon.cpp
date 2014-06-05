@@ -5,6 +5,8 @@
 #include "param.h"
 #include "grid.h"
 
+std::vector<double> get_direction(double theta, double phi);
+
 extern double rand_double();
 extern double rand_tau();
 extern double rand_phi();
@@ -26,6 +28,7 @@ Photon::Photon(double x, double y, double z, double ang1, double ang2, bool scan
 }
 
 void Photon::init(double x, double y, double z, double ang1, double ang2, bool scan){
+	pos = std::vector<double>(3);
 	pos[0] = x;
 	pos[1] = y;
 	pos[2] = z;
@@ -40,9 +43,7 @@ void Photon::init(double x, double y, double z, double ang1, double ang2, bool s
 	escaped = false;
 	is_scan = scan;
 	
-	dir[0] = sin(ang1)*cos(ang2);
-	dir[1] = sin(ang1)*sin(ang2);
-	dir[2] = cos(ang1);
+	dir = get_direction(ang1, ang2);
 
 }
 
@@ -51,9 +52,7 @@ void Photon::scatter(){
 	double phi = rand_phi();
 	double theta = rand_theta();
 	
-	dir[0] = sin(theta)*cos(phi);
-	dir[1] = sin(theta)*sin(phi);
-	dir[2] = cos(theta);
+	dir = get_direction(theta, phi);
 	
 	tau_cur = 0.0;
 	
@@ -149,4 +148,12 @@ Photon Photon::peel(double ang1, double ang2){
 
 double Photon::get_tau_cur(){
 	return tau_cur;
+}
+
+std::vector<double> get_direction(double theta, double phi){
+	std::vector<double> direction(3);
+	direction[0] = cos(theta)*cos(phi);
+	direction[1] = sin(theta)*cos(phi);
+	direction[2] = sin(phi);
+	return direction;
 }
