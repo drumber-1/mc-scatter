@@ -132,26 +132,27 @@ void do_colden_calculation(){
 	
 	//Column density calculations
 	for(list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
+	
+		double theta = (*img).get_theta();
+		double phi = (*img).get_phi();
+		
 		for(int i = 0; i < (*img).get_npixels(0); i++){
 			for(int j = 0; j < (*img).get_npixels(1); j++){
 				double ximage = (*img).get_left_bound(0) + (double)i*(*img).get_spacing(0);
 				double yimage = (*img).get_left_bound(1) + (double)j*(*img).get_spacing(1);
-				//Assume zimage = 0
-				
-				double theta = (*img).get_theta();
-				double phi = (*img).get_phi();
+				//Take zimage = 0
 				
 				//Instead of trying to find the edge of the grid, for each point
-				// we will fire two photons, on in each direction from the centre
+				//we will fire two photons, one in each direction from the centre
 				
 				//I think this is right
 				//double x = ximage*sin(theta) + yimage*cos(theta);
 				//double y = ximage*cos(theta)*sin(phi) - yimage*sin(theta)*sin(phi);
 				//double z = ximage*cos(theta)*cos(phi) - yimage*sin(theta)*cos(phi);
 				
-				double x = ximage;
-				double y = yimage;
-				double z = 0.0;
+				double x = 0.0;
+				double y = ximage;
+				double z = yimage;
 				
 				Photon p1 (x, y, z, theta, phi, true);
 				while(!p1.escaped){
@@ -159,7 +160,7 @@ void do_colden_calculation(){
 				}
 				double colden = p1.get_tau_cur();
 				
-				Photon p2 (x, y, z, 2*M_PI*theta, -1*phi, true);
+				Photon p2 (x, y, z, theta + M_PI, -1*phi, true);
 				while(!p2.escaped){
 					p2.update();
 				}

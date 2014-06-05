@@ -32,7 +32,7 @@ void init_usr(){
 	sub_scatter_image = false; //Whether to output image data from each processor
 	make_colden_image = true;
 	
-	Image im (toRad(0.0), toRad(0.0), 100);
+	Image im (toRad(0.0), toRad(0.0), 200);
 	scatter_images.push_back(im);
 	colden_images.push_back(im);
 
