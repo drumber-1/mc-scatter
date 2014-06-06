@@ -72,16 +72,21 @@ void Photon::update(){
 		next_face[i] = pos[i]; //If dir[i] is 0 then this will be right
 		next_face_dist[i] = 1e9;
 		
-		//TODO check all this and make more elegent
-		if(dir[i] > 0){ //Determine if lower or upper face is needed
-			next_face[i] = grid_space[i]*(floor((pos[i] - grid_left[i])/grid_space[i]) + 1) + grid_left[i]; //Floor + 1 as opposed to ceil incase photon starts on cell face
-		} else if(dir[i] < 0){
-			next_face[i] = grid_space[i]*(ceil((pos[i] - grid_left[i])/grid_space[i]) - 1) + grid_left[i];
+		//cell number of face below photon
+		int cell = floor((pos[i] - grid_left[i])/grid_space[i]);
+		
+		//If moving in positive direction, we want the face above
+		if(dir[i] > 0){ 
+			cell++;
+		} 
+		
+		next_face[i] = grid_space[i]*cell + grid_left[i];
+		if(dir[i] != 0){
+			next_face_dist[i] = (next_face[i] - pos[i])/dir[i];
 		}
 		
-		next_face_dist[i] = (next_face[i] - pos[i])/dir[i];
-		
-		if(next_face_dist[i] == 0){ //Sometimes "whole" numbers are rounded up/down by ceil due to floating point errors, this is to check for that
+		//Sometimes "whole" numbers are rounded up/down by ceil due to floating point errors, this is to check for that
+		if(next_face_dist[i] < 1e-10){
 			if(dir[i] > 0){ 
 				next_face[i] += grid_space[i];
 			} else if(dir[i] < 0){
@@ -104,6 +109,9 @@ void Photon::update(){
 	double rho = get_rho(midpoint[0], midpoint[1], midpoint[2]);
 	double dtau = rho*opacity*next_face_dist_min;
 	
+	if(dtau < -1e10){
+		std::cout << "???" << std::endl;
+	}
 	
 	if(dtau + tau_cur > tau_target && !is_scan){ //Going to interact in this cell
 		double ds = next_face_dist_min*(tau_target - tau_cur)/(dtau);
