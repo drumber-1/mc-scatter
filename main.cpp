@@ -130,11 +130,11 @@ void do_scatter_simulation(int nPhotons){
 
 void do_colden_calculation(){
 	//Column density calculations
+	int i_img = 0;
 	for(list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
-	
 		double theta = (*img).get_theta();
 		double phi = (*img).get_phi();
-		
+		cout << "Column density image: " << i_img << " of " << colden_images.size() << endl;
 		for(int i = 0; i < (*img).get_npixels(0); i++){
 			for(int j = 0; j < (*img).get_npixels(1); j++){
 				double ximage = (*img).get_left_bound(0) + (double)i*(*img).get_spacing(0);
@@ -143,8 +143,8 @@ void do_colden_calculation(){
 				//Instead of trying to find the edge of the grid, for each point
 				//we will fire two photons, one in each direction from the centre
 				
-				double x = -1*ximage*sin(theta) + yimage*cos(theta)*sin(phi);
-				double y = ximage*cos(theta) + yimage*sin(theta)*sin(phi);
+				double x = -1*ximage*sin(theta) - yimage*cos(theta)*sin(phi);
+				double y = ximage*cos(theta) - yimage*sin(theta)*sin(phi);
 				double z = yimage*cos(phi);
 				
 				Photon p1 (x, y, z, theta, phi, true);
@@ -160,12 +160,11 @@ void do_colden_calculation(){
 				colden += p2.get_tau_cur();
 				(*img).add(x, y, z, colden);
 			}				
-		}	
+		}
+		(*img).output_global_image();
+		i_img++;
 	}
 	
-	for(list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
-		(*img).output_global_image();
-	}
 }
 
 void dispose(){
