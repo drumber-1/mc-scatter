@@ -13,6 +13,7 @@ class Image {
 		Image (double, double, int);
 		~Image ();
 		void add(double, double, double, double);
+		void calculate_column_density();
 		void output_global_image(std::string);
 		void output_local_image(std::string);
 		double get_theta();

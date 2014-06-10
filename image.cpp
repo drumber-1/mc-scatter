@@ -7,6 +7,7 @@
 #include "image.h"
 #include "grid.h"
 #include "para.h"
+#include "photon.h"
 
 #undef IMAGE
 
@@ -80,6 +81,35 @@ void Image::add(double x, double y, double z, double weight){
 	//Check if inside of image
 	if(i >= 0 && i < image_npixels[0] && j >= 0 && j < image_npixels[1]){
 		image[i][j] += weight;
+	}
+}
+
+void Image::calculate_column_density(){
+	for(int i = 0; i < image_npixels[0]; i++){
+		for(int j = 0; j < image_npixels[1]; j++){
+			double ximage = image_left[0] + i*image_pixel_spacing[0];
+			double yimage = image_left[1] + j*image_pixel_spacing[1];
+				
+			//Instead of trying to find the edge of the grid, for each point
+			//we will fire two photons, one in each direction from the centre
+				
+			double x = -1*ximage*sin(obs_theta) - yimage*cos(obs_theta)*sin(obs_phi);
+			double y = ximage*cos(obs_theta) - yimage*sin(obs_theta)*sin(obs_phi);
+			double z = yimage*cos(obs_phi);
+				
+			Photon p1 (x, y, z, obs_theta, obs_phi, true);
+			while(!p1.escaped){
+				p1.update();
+			}
+			double colden = p1.get_tau_cur();
+				
+			Photon p2 (x, y, z, obs_theta + M_PI, -1*obs_phi, true);
+			while(!p2.escaped){
+				p2.update();
+			}
+			colden += p2.get_tau_cur();
+			image[i][j] += colden;
+		}				
 	}
 }
 
