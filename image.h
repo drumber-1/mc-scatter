@@ -7,14 +7,14 @@ class Image {
 		double image_left[2], image_right[2], image_pixel_spacing[2];
 		double **image;
 		void init(double, double, int, int);
-		std::string construct_filename(bool);
+		std::string construct_filename(bool, std::string);
 	public:
 		Image (double, double, int, int);
 		Image (double, double, int);
 		~Image ();
 		void add(double, double, double, double);
-		void output_global_image();
-		void output_local_image();
+		void output_global_image(std::string);
+		void output_local_image(std::string);
 		double get_theta();
 		double get_phi();
 		double get_left_bound(int);

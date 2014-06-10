@@ -122,9 +122,9 @@ void do_scatter_simulation(int nPhotons){
 	
 	for(list<Image>::iterator img = scatter_images.begin(); img != scatter_images.end(); img++){
 		if(sub_scatter_image){
-			(*img).output_local_image();
+			(*img).output_local_image("scatter");
 		}
-		(*img).output_global_image();
+		(*img).output_global_image("scatter");
 	}
 }
 
@@ -161,7 +161,7 @@ void do_colden_calculation(){
 				(*img).add(x, y, z, colden);
 			}				
 		}
-		(*img).output_global_image();
+		(*img).output_global_image("colden");
 		i_img++;
 	}
 	

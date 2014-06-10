@@ -58,12 +58,13 @@ void Image::init(double theta, double phi, int nx, int ny){
 	
 }
 
-string Image::construct_filename(bool global){
+string Image::construct_filename(bool global, std::string prefix){
 	string filename;
-	if(global)
-		filename = "./data/image_" + int_to_string(id, 4) + ".dat";
-	else
-		filename = "./data/image_" + int_to_string(id, 4) + "_p" + int_to_string(procRank, 4) + ".dat";
+	if(global) {
+		filename = "./data/" + prefix + "_" + int_to_string(id, 4) + ".dat";
+	} else {
+		filename = "./data/" + prefix + "_" + int_to_string(id, 4) + "_p" + int_to_string(procRank, 4) + ".dat";
+	}
 	
 	return filename;
 }
@@ -83,7 +84,7 @@ void Image::add(double x, double y, double z, double weight){
 }
 
 //TODO Add header
-void Image::output_global_image(){
+void Image::output_global_image(std::string prefix){
 		
 	// Create global image
 	double g_image[image_npixels[0]][image_npixels[1]];
@@ -95,7 +96,7 @@ void Image::output_global_image(){
 	
 	if(procRank == 0) {
 		ofstream fout;
-		string fname = construct_filename(true);
+		string fname = construct_filename(true, prefix);
 		fout.open(fname.c_str());
 		if(fout.good()) {
 			for(int i = 0; i < image_npixels[0]; i++){
@@ -111,9 +112,9 @@ void Image::output_global_image(){
 	
 }
 
-void Image::output_local_image(){
+void Image::output_local_image(std::string prefix){
 	ofstream fout;
-	string fname = construct_filename(false);
+	string fname = construct_filename(false, prefix);
 			
 	fout.open(fname.c_str());
 	if(fout.good()) {
