@@ -132,7 +132,9 @@ void do_colden_calculation(){
 	//Column density calculations
 	int i_img = 0;
 	for(list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
-		cout << "Column density image: " << i_img << " of " << colden_images.size() << endl;
+		if(procRank == 0){
+			cout << "Column density image: " << i_img << " of " << colden_images.size() << endl;
+		}
 		(*img).calculate_column_density();
 		(*img).output_global_image("colden");
 		i_img++;

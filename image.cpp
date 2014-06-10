@@ -85,7 +85,20 @@ void Image::add(double x, double y, double z, double weight){
 }
 
 void Image::calculate_column_density(){
-	for(int i = 0; i < image_npixels[0]; i++){
+
+	int bounds[procSize+1];
+	int per_proc = image_npixels[0]/procSize;
+	int remainder = image_npixels[0]%procSize;
+	for(int i = 0; i <= procSize; i++){
+		bounds[i] = i*per_proc;
+		if(i < remainder){
+			bounds[i] += i;
+		} else {
+			bounds[i] += remainder;
+		}
+	}
+
+	for(int i = bounds[procRank]; i < bounds[procRank+1]; i++){
 		for(int j = 0; j < image_npixels[1]; j++){
 			double ximage = image_left[0] + i*image_pixel_spacing[0];
 			double yimage = image_left[1] + j*image_pixel_spacing[1];
