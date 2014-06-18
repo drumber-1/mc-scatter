@@ -82,6 +82,8 @@ void set_defaults(){
 	sub_scatter_image = false; //Whether to output image data from each processor
 	
 	make_colden_image = true;
+	
+	data_location = "./data";
 }
 
 void do_scatter_simulation(int nPhotons){

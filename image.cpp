@@ -8,6 +8,7 @@
 #include "grid.h"
 #include "para.h"
 #include "photon.h"
+#include "param.h"
 
 #undef IMAGE
 
@@ -62,9 +63,9 @@ void Image::init(double theta, double phi, int nx, int ny){
 string Image::construct_filename(bool global, std::string prefix){
 	string filename;
 	if(global) {
-		filename = "./data/" + prefix + "_" + int_to_string(id, 4) + ".dat";
+		filename = data_location + "/" + prefix + "_" + int_to_string(id, 4) + ".dat";
 	} else {
-		filename = "./data/" + prefix + "_" + int_to_string(id, 4) + "_p" + int_to_string(procRank, 4) + ".dat";
+		filename = data_location + "/" + prefix + "_" + int_to_string(id, 4) + "_p" + int_to_string(procRank, 4) + ".dat";
 	}
 	
 	return filename;
