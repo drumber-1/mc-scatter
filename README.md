@@ -12,8 +12,9 @@ where <problem> is the name of the directory (within the problems directory) con
 Coordinates
 -----------
 
-mc-scatter uses often refers to the angles theta and phi.
+mc-scatter often refers to the angles theta and phi.
 
-theta is the angle away from positive x in the x-y plane.
-phi is the angle out of the x-y. phi = pi/2 points in the positive z direction, phi = -pi/2 points in the negative x direction
+Theta = phi = zero looks down the positive x axis.
+Theta is the angle away from positive x, in the x-y plane.
+Phi is the angle out of the x-y plane. Phi = pi/2 points in the positive z direction, phi = -pi/2 points in the negative x direction
 
