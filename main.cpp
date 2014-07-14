@@ -34,22 +34,21 @@ extern Photon generate_photon();
 extern double rand_double();
 extern double toRad(double angle);
 extern double get_rho(double x, double y, double z);
+extern void grid_output_slices(unsigned int sliced_dim);
 
 int main(int argc, char *argv[]){
 
 	init(argc, argv);
 	
+	if(make_grid_slices){
+		grid_output_slices(1);
+	}
+	
 	if(make_scatter_image){
-		if(procRank == 0){
-			cout << "Starting scattering simluation" << endl;
-		}
 		do_scatter_simulation(NSAMPLES/procSize);
 	}
 	
 	if(make_colden_image){
-		if(procRank == 0) {
-			cout << "Calculating column densities" << endl;
-		}
 		do_colden_calculation();
 	}
 
@@ -81,12 +80,23 @@ void set_defaults(){
 	make_scatter_image = true;
 	sub_scatter_image = false; //Whether to output image data from each processor
 	
-	make_colden_image = true;
+	make_colden_image = false;
+	
+	make_grid_slices = false;
 	
 	data_location = "./data";
+	controlled_setup = false;
 }
 
 void do_scatter_simulation(int nPhotons){
+
+	if(procRank == 0){
+		cout << "Starting scattering simluation" << endl;
+	}
+
+	//Create folder
+	string mkdir_cmd = "mkdir -p " + data_location + "/scatter";
+	system(mkdir_cmd.c_str());
 	
 	int print_step = nPhotons/5;
 
@@ -131,8 +141,17 @@ void do_scatter_simulation(int nPhotons){
 }
 
 void do_colden_calculation(){
+
+	if(procRank == 0) {
+		cout << "Calculating column densities" << endl;
+	}
+
+	//Create folder
+	string mkdir_cmd = "mkdir -p " + data_location + "/colden";
+	system(mkdir_cmd.c_str());
+
 	//Column density calculations
-	int i_img = 0;
+	int i_img = 1;
 	for(list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
 		if(procRank == 0){
 			cout << "Column density image: " << i_img << " of " << colden_images.size() << endl;
