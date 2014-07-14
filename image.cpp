@@ -63,9 +63,9 @@ void Image::init(double theta, double phi, int nx, int ny){
 string Image::construct_filename(bool global, std::string prefix){
 	string filename;
 	if(global) {
-		filename = data_location + "/" + prefix + "_" + int_to_string(id, 4) + ".dat";
+		filename = data_location + "/" + prefix + "/" + prefix + "_" + int_to_string(id, 4) + ".dat";
 	} else {
-		filename = data_location + "/" + prefix + "_" + int_to_string(id, 4) + "_p" + int_to_string(procRank, 4) + ".dat";
+		filename = data_location + "/" + prefix + "/" + prefix + "_" + int_to_string(id, 4) + "_p" + int_to_string(procRank, 4) + ".dat";
 	}
 	
 	return filename;
@@ -143,27 +143,28 @@ void Image::output_global_image(std::string prefix){
 		string fname = construct_filename(true, prefix);
 		fout.open(fname.c_str());
 		if(fout.good()) {
-			for(int i = 0; i < image_npixels[0]; i++){
-				for(int j = 0; j < image_npixels[1]; j++){
+			for(int j = 0; j < image_npixels[1]; j++){
+				for(int i = 0; i < image_npixels[0]; i++){
 					fout << i << "\t" << j << "\t" << g_image[i][j] << endl;
 				}
 			}
 			fout.close();
 		} else {
-			cerr << "Could not open output file" << endl;
+			cerr << "Could not open output file: " << fname << endl;
 		}
 	}
 	
 }
 
+//x axes is inner loop so a 1D array of pixel values can be reshaped more easily
 void Image::output_local_image(std::string prefix){
 	ofstream fout;
 	string fname = construct_filename(false, prefix);
 			
 	fout.open(fname.c_str());
 	if(fout.good()) {
-		for(int i = 0; i < image_npixels[0]; i++){
-			for(int j = 0; j < image_npixels[1]; j++){
+		for(int j = 0; j < image_npixels[1]; j++){
+			for(int i = 0; i < image_npixels[0]; i++){
 				fout << i << "\t" << j << "\t" << image[i][j] << endl;
 			}				
 		}
