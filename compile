@@ -7,7 +7,7 @@ else
 		make clean
 	else
 		if (-f ./prob.cpp) then
-			diff --brief ./problems/$1/prob.cpp ./prob.cpp > ./dump
+			diff --brief ./problems/$1/prob.cpp ./prob.cpp > /dev/null
 			if($status) then
 				echo "copying prob.cpp"
 				cp ./problems/$1/prob.cpp ./prob.cpp
@@ -24,7 +24,7 @@ else
 		endif
 
 		if (-f ./prob.h) then
-			diff --brief ./problems/$1/prob.h ./prob.h > ./dump
+			diff --brief ./problems/$1/prob.h ./prob.h > /dev/null
 			if($status) then
 				echo "copying prob.h"
 				cp ./problems/$1/prob.h ./prob.h
