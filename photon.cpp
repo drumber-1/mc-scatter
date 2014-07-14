@@ -69,8 +69,7 @@ void Photon::update(){
 	double midpoint[3]; //Coordinate of mid point from current position to face that photon will hit, using this instead of photon position avoids ambiguity is starting on face
 	
 	for(int i = 0; i < 3; i++){
-		next_face[i] = pos[i]; //If dir[i] is 0 then this will be right
-		next_face_dist[i] = 1e9;
+		next_face_dist[i] = 1e99;
 		
 		//cell number of face below photon
 		int cell = floor((pos[i] - grid_left[i])/grid_space[i]);
@@ -83,6 +82,8 @@ void Photon::update(){
 		next_face[i] = grid_space[i]*cell + grid_left[i];
 		if(dir[i] != 0){
 			next_face_dist[i] = (next_face[i] - pos[i])/dir[i];
+		} else {
+			next_face_dist[i] = 1e99;
 		}
 		
 		//Sometimes "whole" numbers are rounded up/down by ceil due to floating point errors, this is to check for that
