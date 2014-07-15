@@ -12,6 +12,7 @@ using namespace std;
 
 void init_usr();
 double setup_density(double x, double y, double z);
+void setup_density();
 Photon generate_photon();
 
 extern double toRad(double angle);
@@ -31,6 +32,7 @@ void init_usr(){
 	make_scatter_image = false;
 	sub_scatter_image = false; //Whether to output image data from each processor
 	make_colden_image = true;
+	controlled_setup = false;
 	
 	Image im (toRad(0.0), toRad(0.0), 200);
 	scatter_images.push_back(im);
@@ -46,6 +48,9 @@ double setup_density(double x, double y, double z){
 	} else {
 		return 0.0001;
 	}
+}
+
+void setup_density(){
 }
 
 Photon generate_photon(){
