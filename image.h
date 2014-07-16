@@ -12,6 +12,7 @@ class Image {
 		Image (double, double, int, int);
 		Image (double, double, int);
 		~Image ();
+		Image(const Image&);
 		void add(double, double, double, double);
 		void calculate_column_density();
 		void output_global_image(std::string);

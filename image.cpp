@@ -25,6 +25,37 @@ Image::Image(double theta, double phi, int nxy){
 }
 
 Image::~Image(){
+	for(int i = 0; i < image_npixels[0]; i++){
+		delete[] image[i];
+	}
+
+	delete[] image;
+}
+
+Image::Image(const Image& other){
+	id = other.id;
+	
+	obs_theta = other.obs_theta;
+	obs_phi = other.obs_phi;
+	
+	for(int i = 0; i < 2; i++){
+		image_npixels[i] = other.image_npixels[i];
+		image_left[i] = other.image_left[i];
+		image_right[i] = other.image_left[i];
+		image_pixel_spacing[i] = other.image_pixel_spacing[i];
+	}
+		
+	image = new double *[image_npixels[0]];
+	
+	for(int i = 0; i < image_npixels[0]; i++){
+		image[i] = new double [image_npixels[1]];
+	}
+	
+	for(int i = 0; i < image_npixels[0]; i++){
+		for(int j = 0; j < image_npixels[1]; j++){
+			image[i][j] = other.image[i][j];
+		}
+	}
 }
 
 void Image::init(double theta, double phi, int nx, int ny){
