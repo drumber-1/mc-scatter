@@ -16,12 +16,12 @@ using namespace std;
 
 extern string int_to_string(int n, int width);
 
-Image::Image(double theta, double phi, int nx, int ny){
-	init(theta, phi, nx, ny);
+Image::Image(double theta, double phi, int nx, int ny, double left, double right){
+	init(theta, phi, nx, ny, left, right);
 }
 
-Image::Image(double theta, double phi, int nxy){
-	init(theta, phi, nxy, nxy);
+Image::Image(double theta, double phi, int nxy, double left, double right){
+	init(theta, phi, nxy, nxy, left, right);
 }
 
 Image::~Image(){
@@ -58,7 +58,8 @@ Image::Image(const Image& other){
 	}
 }
 
-void Image::init(double theta, double phi, int nx, int ny){
+//TODO Add image parameters class
+void Image::init(double theta, double phi, int nx, int ny, double left, double right){
 	
 	id = nimages;
 	nimages++;
@@ -70,10 +71,9 @@ void Image::init(double theta, double phi, int nx, int ny){
 	obs_phi = phi;
 	
 	for(int i = 0; i < 2; i++){
-		//TODO scale image size for angled image planes
-		// Possibly have a mode for fixed size for rotating images
-		image_left[i] = grid_left[i];
-		image_right[i] = grid_right[i];
+		//TODO Increase flexablity of image size/resolution
+		image_left[i] = left;
+		image_right[i] = right;
 		image_pixel_spacing[i] = (image_right[i] - image_left[i])/image_npixels[i];
 	}
 		
@@ -116,7 +116,7 @@ void Image::add(double x, double y, double z, double weight){
 	}
 }
 
-void Image::calculate_column_density(){
+void Image::calculate_column_density(const Grid& grid){
 
 	int bounds[procSize+1];
 	int per_proc = image_npixels[0]/procSize;
@@ -137,20 +137,20 @@ void Image::calculate_column_density(){
 				
 			//Instead of trying to find the edge of the grid, for each point
 			//we will fire two photons, one in each direction from the centre
-				
+			
 			double x = -1*ximage*sin(obs_theta) - yimage*cos(obs_theta)*sin(obs_phi);
 			double y = ximage*cos(obs_theta) - yimage*sin(obs_theta)*sin(obs_phi);
 			double z = yimage*cos(obs_phi);
 				
 			Photon p1 (x, y, z, obs_theta, obs_phi, true);
 			while(!p1.escaped){
-				p1.update();
+				p1.update(grid);
 			}
 			double colden = p1.get_tau_cur();
 				
 			Photon p2 (x, y, z, obs_theta + M_PI, -1*obs_phi, true);
 			while(!p2.escaped){
-				p2.update();
+				p2.update(grid);
 			}
 			colden += p2.get_tau_cur();
 			image[i][j] += colden;

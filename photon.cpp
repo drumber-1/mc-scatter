@@ -60,59 +60,74 @@ void Photon::scatter(){
 	scattered = true;
 }
 
-void Photon::update(){
+void Photon::update(const Grid& grid){
 	scattered = false;
 	
-	double next_face[3]; //x y and z faces, In physical space, that the photon will pass next for each axis
-	double next_face_dist[3]; //Distance, along photon path to that face
-	double next_face_dist_min = 1e99; //Distance, along photon path to face that will be hit next 
-	double midpoint[3]; //Coordinate of mid point from current position to face that photon will hit, using this instead of photon position avoids ambiguity is starting on face
+	std::vector<int> cell = grid.get_cell(pos); //Cell containing photon
+	
+	std::vector<int> next_cell(3); //x y and z cell faces that the photon will pass next
+	for(int i = 0; i < 3; i++){
+		//If moving in positive direction, we want the face above
+		if(dir[i] > 0){ 
+			next_cell[i] = cell[i] + 1;
+		}  else {
+			next_cell[i] = cell[i];
+		}
+	}
+	
+	std::vector<double> next_face = grid.get_position(next_cell); //x y and z faces, In physical space, that the photon will pass next for each axis
+	std::vector<double> next_face_dist(3); //Distance, along photon path to that face
+	std::vector<double> midpoint(3); //Coordinate of mid point from current position to face that photon will hit, using this instead of photon position avoids ambiguity is starting on face
 	
 	for(int i = 0; i < 3; i++){
 		next_face_dist[i] = 1e99;
 		
-		//cell number of face below photon
-		int cell = floor((pos[i] - grid_left[i])/grid_space[i]);
-		
-		//If moving in positive direction, we want the face above
-		if(dir[i] > 0){ 
-			cell++;
-		} 
-		
-		next_face[i] = grid_space[i]*cell + grid_left[i];
 		if(dir[i] != 0){
 			next_face_dist[i] = (next_face[i] - pos[i])/dir[i];
 		} else {
 			next_face_dist[i] = 1e99;
 		}
-		
-		//Sometimes "whole" numbers are rounded up/down by ceil due to floating point errors, this is to check for that
+	}
+	
+	//Sometimes "whole" numbers are rounded up/down due to floating point errors if photon is very close to a face
+	//Shift to next face if within 1e-10 of the cell face
+	bool cell_corrected = false;
+	for(int i = 0; i < 3; i++){
 		if(next_face_dist[i] < 1e-10){
+			cell_corrected = true;
 			if(dir[i] > 0){ 
-				next_face[i] += grid_space[i];
+				next_cell[i] += 1;
 			} else if(dir[i] < 0){
-				next_face[i] -= grid_space[i];
+				next_cell[i] -= 1;
 			}
+		}
+	}
+	if(cell_corrected){
+		next_face = grid.get_position(next_cell);
+		for(int i = 0; i < 3; i++){
 			next_face_dist[i] = (next_face[i] - pos[i])/dir[i];
 		}
-		
+	}
+	
+	//Find which face will be hit first
+	double next_face_dist_min = 1e99; //Distance, along photon path to face that will be hit next
+	for(int i = 0; i < 3; i++){
 		if(next_face_dist[i] < next_face_dist_min){
 			next_face_dist_min = next_face_dist[i];
 		}
 	}
 	
-	//Calculate midpoint
+	//Calculate midpoint, to take our rho value from
 	for(int i = 0; i < 3; i++){
 		midpoint[i] = pos[i] + dir[i]*next_face_dist_min/2.0;
 	}
 	
-	//Get density
-	double rho = get_rho(midpoint[0], midpoint[1], midpoint[2]);
+	double rho = grid.get_rho(midpoint);
 	double dtau = rho*opacity*next_face_dist_min;
 	
-	if(dtau < -1e10){
-		std::cout << "???" << std::endl;
-	}
+	//if(dtau < -1e10){
+	//	std::cout << "???" << std::endl;
+	//}
 	
 	if(dtau + tau_cur > tau_target && !is_scan){ //Going to interact in this cell
 		double ds = next_face_dist_min*(tau_target - tau_cur)/(dtau);
@@ -123,11 +138,8 @@ void Photon::update(){
 		move(next_face_dist_min);
 	}
 	
-	for(int i = 0; i < 3; i++){ //Check if escaped
-		if(pos[i] >= grid_right[i] || pos[i] <= grid_left[i]){
-			escaped = true;
-			break;
-		}
+	if(!grid.is_on_grid(pos)){
+		escaped = true;
 	}
 }
 

@@ -18,8 +18,8 @@ using namespace std;
 
 void init(int argc, char *argv[]);
 void set_defaults();
-void do_scatter_simulation(int nPhotons);
-void do_colden_calculation();
+void do_scatter_simulation(const Grid& grid, int nPhotons);
+void do_colden_calculation(const Grid&);
 void dispose(); //Exit safely, as success
 void term(); //Exit safely, as failure
 
@@ -30,6 +30,7 @@ extern void init_random();
 extern void init_grid();
 extern void init_usr();
 extern void init_text();
+extern Grid generate_grid();
 extern Photon generate_photon();
 extern double rand_double();
 extern double toRad(double angle);
@@ -40,16 +41,18 @@ int main(int argc, char *argv[]){
 
 	init(argc, argv);
 	
+	Grid grid = generate_grid();
+	
 	if(make_grid_slices){
-		grid_output_slices(1);
+		grid.output_slices(data_location, 1);
 	}
 	
 	if(make_scatter_image){
-		do_scatter_simulation(NSAMPLES/procSize);
+		do_scatter_simulation(grid, NSAMPLES/procSize);
 	}
 	
 	if(make_colden_image){
-		do_colden_calculation();
+		do_colden_calculation(grid);
 	}
 
 	dispose();
@@ -61,21 +64,12 @@ void init(int argc, char *argv[]){ //Order of init calls is important!
 	init_random();
 	
 	set_defaults();
-	
 	init_usr();
-	
-	init_grid();
 }
 
 void set_defaults(){
 	albedo = 1.0;
 	opacity = 1.0;
-	
-	for(int i = 0; i < 3; i++){
-		grid_ncells[i] = 100;
-		grid_left[i] = -10;
-		grid_right[i] = 10;
-	}
 	
 	make_scatter_image = true;
 	sub_scatter_image = false; //Whether to output image data from each processor
@@ -88,7 +82,7 @@ void set_defaults(){
 	controlled_setup = false;
 }
 
-void do_scatter_simulation(int nPhotons){
+void do_scatter_simulation(const Grid& grid, int nPhotons){
 
 	if(procRank == 0){
 		cout << "Starting scattering simluation" << endl;
@@ -110,7 +104,7 @@ void do_scatter_simulation(int nPhotons){
 		Photon p = generate_photon();
 		
 		while(true){
-			p.update();
+			p.update(grid);
 			
 			if(p.absorbed || p.escaped){
 				break;
@@ -122,7 +116,7 @@ void do_scatter_simulation(int nPhotons){
 					double phi = (*img).get_phi();
 					Photon p_peel = p.peel(theta, phi);
 					while(!p_peel.escaped){
-						p_peel.update();
+						p_peel.update(grid);
 					}
 					double weight = exp(-1*p_peel.get_tau_cur());
 					(*img).add(p_peel.pos[0], p_peel.pos[1], p_peel.pos[2], weight);
@@ -140,7 +134,8 @@ void do_scatter_simulation(int nPhotons){
 	}
 }
 
-void do_colden_calculation(){
+//TODO: Profile different parallisation methods here
+void do_colden_calculation(const Grid& grid){
 
 	if(procRank == 0) {
 		cout << "Calculating column densities" << endl;
@@ -156,7 +151,7 @@ void do_colden_calculation(){
 		if(procRank == 0){
 			cout << "Column density image: " << i_img << " of " << colden_images.size() << endl;
 		}
-		(*img).calculate_column_density();
+		(*img).calculate_column_density(grid);
 		(*img).output_global_image("colden");
 		i_img++;
 	}

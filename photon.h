@@ -1,4 +1,5 @@
 #include <vector>
+#include "grid.h"
 
 class Photon {
 		std::vector<double> dir; //Normalized direction vectors
@@ -15,7 +16,7 @@ class Photon {
 		bool is_scan; //A scanning photon will never interact
 		Photon(double, double, double);
 		Photon(double, double, double, double, double, bool);
-		void update();
+		void update(const Grid&);
 		double radius2();
 		Photon peel(double, double);
 		double get_tau_cur();

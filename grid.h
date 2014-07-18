@@ -1,11 +1,29 @@
-#ifdef GRID
-int grid_ncells[3];
-double ***rhoData;
-double grid_left[3], grid_right[3], grid_space[3];
-bool make_grid_slices;
-#else
-extern int grid_ncells[3];
-extern double ***rhoData;
-extern double grid_left[3], grid_right[3], grid_space[3];
-extern bool make_grid_slices;
-#endif
+#pragma once
+
+#include <string>
+#include <vector>
+
+class GridParameters {
+	public:
+		int ncells[3];
+		double left_boundary[3];
+		double right_boundary[3];
+};
+
+//TODO: Add traversal/iterator methods
+class Grid {
+		GridParameters parameters;
+		double ***rho_data;
+		double spacing[3];
+	public:
+		Grid(const GridParameters&);
+		~Grid();
+		Grid(const Grid&);
+		void output_slices(std::string, unsigned int) const;
+		bool is_on_grid(std::vector<double> pos) const;
+		std::vector<double> get_position(std::vector<int> cell) const;
+		std::vector<int> get_cell(std::vector<double> pos) const;
+		double get_rho(std::vector<double> pos) const;
+		double get_rho(std::vector<int> cell) const;
+		void set_rho(std::vector<int> cell, double rho);
+};

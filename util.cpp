@@ -4,7 +4,7 @@
 #include <iomanip>
 
 double toRad(double angle);
-std::string int_to_string(int x);
+std::string int_to_string(int x, int width);
 double string_to_double(const std::string& s);
 
 double toRad(double angle){
