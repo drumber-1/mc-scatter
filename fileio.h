@@ -8,9 +8,8 @@ struct FileMetadata {
 class FileIOInterface {	
 	public:
 		virtual ~FileIOInterface() {};
-		virtual FileMetadata getMetadata() = 0;
+		virtual FileMetadata getMetadata(std::string fileName) = 0;
 		virtual std::string getName() = 0;
-		virtual std::string getExtension() = 0;
 		virtual bool readFile(std::string fileName) = 0;
 		virtual bool writeFile(std::string fileName) = 0;
 };
