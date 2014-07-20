@@ -28,6 +28,11 @@ So theta = phi = zero looks down the positive x axis at the YZ plane.
 Example images
 --------------
 
+Column density from the sphere test problem. With 500x500x500 density grid and 500x500 image grid.
+
+<img src="https://github.com/drumber-1/mc-scatter-examples/raw/master/colden/sphere.png" alt="Galaxy column density" style="width: 300px;"/>
+
 A snapshot of a fluid dynamic simulation, showing the column density at a variety of angles: (Black artifacts at the edge are due to the cube not extending further than the image)
 
 <img src="https://github.com/drumber-1/mc-scatter-examples/raw/master/colden/disk_gal.gif" alt="Galaxy column density" style="width: 300px;"/>
+
