@@ -5,6 +5,8 @@
 #include <vector>
 #include <unistd.h>
 #include <cmath>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "grid.h"
 #include "param.h"
 #include "para.h"
@@ -63,13 +65,12 @@ void Grid::output_slices(std::string data_location, unsigned int sliced_dim) con
 	}
 	
 	if(procRank == 0){
-		//Create folder
-		std::string mkdir_cmd = "mkdir -p " + data_location + "/slices";
-		if(!system(mkdir_cmd.c_str())){
-			if(procRank == 0){
-				std::cerr << "Could not create slices directory in " << data_location << std::endl;
-			}
-			return;
+		
+		//Create folder is it doesn't exist
+		std::string folder_name = data_location + "/slices";
+		struct stat st = {0};
+		if(stat(folder_name.c_str(), &st) == -1){
+			mkdir(folder_name.c_str(), 0700);
 		}
 	
 		unsigned int unsliced_dim1 = (sliced_dim + 1) % 3;

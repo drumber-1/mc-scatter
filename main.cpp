@@ -6,6 +6,9 @@
 #include <sstream>
 #include <cmath>
 #include <string>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "param.h"
 #include "para.h"
 #include "grid.h"
@@ -88,13 +91,11 @@ void do_scatter_simulation(const Grid& grid, int nPhotons){
 		cout << "Starting scattering simluation" << endl;
 	}
 
-	//Create folder
-	string mkdir_cmd = "mkdir -p " + data_location + "/scatter";
-	if(!system(mkdir_cmd.c_str())){
-		if(procRank == 0){
-			 cerr << "Could not create scatter directory in " << data_location << endl;
-		}
-		return;
+	//Create folder is it doesn't exist
+	string folder_name = data_location + "/scatter";
+	struct stat st = {0};
+	if(stat(folder_name.c_str(), &st) == -1){
+		mkdir(folder_name.c_str(), 0700);
 	}
 	
 	int print_step = nPhotons/5;
@@ -145,14 +146,12 @@ void do_colden_calculation(const Grid& grid){
 	if(procRank == 0) {
 		cout << "Calculating column densities" << endl;
 	}
-
-	//Create folder
-	string mkdir_cmd = "mkdir -p " + data_location + "/colden";
-	if(!system(mkdir_cmd.c_str())){
-		if(procRank == 0){
-			 cerr << "Could not create colden directory in " << data_location << endl;
-		}
-		return;
+	
+	//Create folder is it doesn't exist
+	string folder_name = data_location + "/colden";
+	struct stat st = {0};
+	if(stat(folder_name.c_str(), &st) == -1){
+		mkdir(folder_name.c_str(), 0700);
 	}
 
 	//Column density calculations
