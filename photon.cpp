@@ -105,7 +105,11 @@ void Photon::update(const Grid& grid){
 	if(cell_corrected){
 		next_face = grid.get_position(next_cell);
 		for(int i = 0; i < 3; i++){
-			next_face_dist[i] = (next_face[i] - pos[i])/dir[i];
+			if(dir[i] != 0){
+				next_face_dist[i] = (next_face[i] - pos[i])/dir[i];
+			} else {
+				next_face_dist[i] = 1e99;
+			}
 		}
 	}
 	
@@ -124,10 +128,6 @@ void Photon::update(const Grid& grid){
 	
 	double rho = grid.get_rho(midpoint);
 	double dtau = rho*opacity*next_face_dist_min;
-	
-	//if(dtau < -1e10){
-	//	std::cout << "???" << std::endl;
-	//}
 	
 	if(dtau + tau_cur > tau_target && !is_scan){ //Going to interact in this cell
 		double ds = next_face_dist_min*(tau_target - tau_cur)/(dtau);
