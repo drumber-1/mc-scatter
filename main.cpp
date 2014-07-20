@@ -90,7 +90,12 @@ void do_scatter_simulation(const Grid& grid, int nPhotons){
 
 	//Create folder
 	string mkdir_cmd = "mkdir -p " + data_location + "/scatter";
-	system(mkdir_cmd.c_str());
+	if(!system(mkdir_cmd.c_str())){
+		if(procRank == 0){
+			 cerr << "Could not create scatter directory in " << data_location << endl;
+		}
+		return;
+	}
 	
 	int print_step = nPhotons/5;
 
@@ -143,7 +148,12 @@ void do_colden_calculation(const Grid& grid){
 
 	//Create folder
 	string mkdir_cmd = "mkdir -p " + data_location + "/colden";
-	system(mkdir_cmd.c_str());
+	if(!system(mkdir_cmd.c_str())){
+		if(procRank == 0){
+			 cerr << "Could not create colden directory in " << data_location << endl;
+		}
+		return;
+	}
 
 	//Column density calculations
 	int i_img = 1;
