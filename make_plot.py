@@ -1,5 +1,3 @@
-#!/common/software/python/epd-7.2-2-rh3-x86_64/bin/python
-
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.interpolate
