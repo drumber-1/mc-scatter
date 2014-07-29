@@ -7,11 +7,10 @@ class Image {
 		int image_npixels[2], id;
 		double image_left[2], image_right[2], image_pixel_spacing[2];
 		double **image;
-		void init(double, double, int, int, double, double);
+		void init(double, double, const GridParameters&);
 		std::string construct_filename(bool, std::string);
 	public:
-		Image (double, double, int, int, double, double);
-		Image (double, double, int, double, double);
+		Image (double, double, const GridParameters&);
 		~Image ();
 		Image(const Image&);
 		void add(double, double, double, double);
@@ -26,6 +25,8 @@ class Image {
 		int get_npixels(int);
 		void print_info();
 };
+
+//TODO: Clean up these globals
 
 #ifdef IMAGE
 bool make_scatter_image, sub_scatter_image;

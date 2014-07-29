@@ -16,12 +16,14 @@ using namespace std;
 
 extern string int_to_string(int n, int width);
 
-Image::Image(double theta, double phi, int nx, int ny, double left, double right){
-	init(theta, phi, nx, ny, left, right);
-}
-
-Image::Image(double theta, double phi, int nxy, double left, double right){
-	init(theta, phi, nxy, nxy, left, right);
+//Decides the best grid resolution and size based on the grid parameters
+//Is very naive, and just copies X & Y resolution/size. This is not ideal
+//if the grid is not a cube and the image plane is not XY aligned
+//TODO: Calculate the ideal grid size for arbitary images
+//May still want naive approach as an option, so that multiple images
+//at different angles are the same size
+Image::Image(double theta, double phi, const GridParameters& gp){
+	init(theta, phi, gp);
 }
 
 Image::~Image(){
@@ -58,22 +60,18 @@ Image::Image(const Image& other){
 	}
 }
 
-//TODO Add image parameters class
-void Image::init(double theta, double phi, int nx, int ny, double left, double right){
+void Image::init(double theta, double phi, const GridParameters& gp){
 	
 	id = nimages;
 	nimages++;
-	
-	image_npixels[0] = nx;
-	image_npixels[1] = ny;
 	
 	obs_theta = theta;
 	obs_phi = phi;
 	
 	for(int i = 0; i < 2; i++){
-		//TODO Increase flexablity of image size/resolution
-		image_left[i] = left;
-		image_right[i] = right;
+		image_npixels[i] = gp.ncells[i];
+		image_left[i] = gp.left_boundary[i];
+		image_right[i] = gp.right_boundary[i];
 		image_pixel_spacing[i] = (image_right[i] - image_left[i])/image_npixels[i];
 	}
 		
