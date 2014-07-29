@@ -1,6 +1,6 @@
 CPP = mpic++
-CPPFLAGS = -lm -Wall -L/usr/lib64
-LFLAGS = -Wall
+CPPFLAGS = -std=c++0x -lm -Wall -L/usr/lib64
+LFLAGS = -Wall -pg
 
 OBJS = main.o para.o random.o grid.o photon.o prob.o image.o util.o fileio_mg.o
 
@@ -9,6 +9,9 @@ all: scatter
 
 debug: CPPFLAGS += -g -O0
 debug: scatter
+
+prof: CPPFLAGS += -pg -O2
+prof: scatter
 
 scatter : $(OBJS)
 	$(CPP) $(LFLAGS) $(OBJS) -o scatter
