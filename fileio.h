@@ -1,15 +1,11 @@
-#include <string>
+#pragma once
 
-struct FileMetadata {
-	double grid_spacing;
-	double time_stamp;
-};
+#include <string>
+#include "grid.h"
 
 class FileIOInterface {	
 	public:
 		virtual ~FileIOInterface() {};
-		virtual FileMetadata getMetadata(std::string fileName) = 0;
-		virtual std::string getName() = 0;
-		virtual bool readFile(std::string fileName) = 0;
-		virtual bool writeFile(std::string fileName) = 0;
+		virtual Grid read_file(std::string, const GridParameters&) = 0; //TODO: Check compiler is optimizing out copying on return
+		virtual void write_file(std::string, const Grid&) = 0;
 };
