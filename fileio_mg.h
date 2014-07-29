@@ -1,9 +1,11 @@
+#pragma once
+
 #include <string>
 #include "fileio.h"
+#include "grid.h"
 
 class FileIOMG : public FileIOInterface {
-	FileMetadata getMetadata(std::string fileName);
-	std::string getName();
-	bool readFile(std::string fileName);
-	bool writeFile(std::string fileName);
+	public:
+		Grid read_file(std::string, const GridParameters&);
+		void write_file(std::string, const Grid&);
 };

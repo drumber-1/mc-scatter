@@ -28,16 +28,6 @@ void init_usr(){
 	controlled_setup = false;
 }
 
-double setup_density(double x, double y, double z){
-	double r2 = x*x + y*y + z*z;
-	
-	if(r2 < 1){
-		return 5.0;
-	} else {
-		return 0.0001;
-	}
-}
-
 Grid generate_grid(){
 
 	GridParameters gp;
