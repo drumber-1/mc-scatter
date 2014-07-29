@@ -74,7 +74,7 @@ void set_defaults(){
 	albedo = 1.0;
 	opacity = 1.0;
 	
-	make_scatter_image = true;
+	make_scatter_image = false;
 	sub_scatter_image = false; //Whether to output image data from each processor
 	
 	make_colden_image = false;
