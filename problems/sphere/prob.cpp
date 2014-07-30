@@ -6,7 +6,6 @@
 #include "image.h"
 #include "para.h"
 #include "photon.h"
-#include "prob.h"
 
 using namespace std;
 
