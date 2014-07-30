@@ -13,7 +13,6 @@
 *.a
 
 *~
-prob.cpp
-prob.h
-scatter
-data
+./prob.cpp
+./scatter
+./data
