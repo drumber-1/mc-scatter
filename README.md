@@ -6,13 +6,13 @@ Simple ray tracing code. Has two functions:
 * monte carlo scattered light simulations
 * column density maps at arbitrary angles
 
-mc-scatter can be compiled for different problems using:
+mc-scatter can be setup for different problems using:
 
-./compile "problem"
+./configure "problem"
 
-where "problem" is the name of the directory (within the problems directory) containing the prob.cpp and prob.h files you wish to compile.
+where "problem" is the name of the directory (within the problems directory) containing a prob.cpp file. (See the sphere and heart problems for examples.)
 
-See the sphere and heart problems for examples.
+Then mc-scatter can be compiled using make.
 
 Coordinates
 -----------
