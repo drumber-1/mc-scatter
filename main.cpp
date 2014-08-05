@@ -14,6 +14,7 @@
 #include "grid.h"
 #include "photon.h"
 #include "image.h"
+#include "console.h"
 
 #undef MAIN
 
@@ -26,9 +27,6 @@ void do_colden_calculation(const Grid&);
 void dispose(); //Exit safely, as success
 void term(); //Exit safely, as failure
 
-extern void init_para(int argc, char *argv[]);
-extern int global_sum(int val);
-extern void dispose_para();
 extern void init_random();
 extern void init_grid();
 extern void init_usr();
@@ -51,19 +49,29 @@ int main(int argc, char *argv[]){
 	}
 	
 	if(make_scatter_image){
-		do_scatter_simulation(grid, NSAMPLES/procSize);
+		do_scatter_simulation(grid, NSAMPLES/para::get_process_rank());
 	}
 	
 	if(make_colden_image){
 		do_colden_calculation(grid);
 	}
+	
+	Console::ReturnCode return_code = Console::ReturnCode::Exit;
+	do {
+		if(para::get_process_rank() == 0){
+			return_code = Console::get_instance().read_line();
+		}
+	} while(return_code != Console::ReturnCode::Exit);
+	
+	para::barrier();
 
 	dispose();
+	
 	return 0;
 }
 
 void init(int argc, char *argv[]){ //Order of init calls is important!
-	init_para(argc, argv);
+	para::init_para(argc, argv);
 	init_random();
 	
 	set_defaults();
@@ -87,7 +95,7 @@ void set_defaults(){
 
 void do_scatter_simulation(const Grid& grid, int nPhotons){
 
-	if(procRank == 0){
+	if(para::get_process_rank() == 0){
 		cout << "Starting scattering simluation" << endl;
 	}
 
@@ -104,7 +112,7 @@ void do_scatter_simulation(const Grid& grid, int nPhotons){
 		
 		//TODO Improve output info
 		if(i%print_step == 0){
-			cout << "Proc " << procRank << ": " << i << " of " << nPhotons << " photons" << endl;
+			cout << "Proc " << para::get_process_rank() << ": " << i << " of " << nPhotons << " photons" << endl;
 		}
 		
 		Photon p = generate_photon();
@@ -143,7 +151,7 @@ void do_scatter_simulation(const Grid& grid, int nPhotons){
 //TODO: Profile different parallisation methods here
 void do_colden_calculation(const Grid& grid){
 
-	if(procRank == 0) {
+	if(para::get_process_rank() == 0) {
 		cout << "Calculating column densities" << endl;
 	}
 	
@@ -157,7 +165,7 @@ void do_colden_calculation(const Grid& grid){
 	//Column density calculations
 	int i_img = 1;
 	for(list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
-		if(procRank == 0){
+		if(para::get_process_rank() == 0){
 			cout << "Column density image: " << i_img << " of " << colden_images.size() << endl;
 		}
 		(*img).calculate_column_density(grid);
@@ -168,11 +176,11 @@ void do_colden_calculation(const Grid& grid){
 }
 
 void dispose(){
-	dispose_para();
+	para::dispose_para();
 	exit(EXIT_SUCCESS);
 }
 
 void term(){
-	dispose_para();
+	para::dispose_para();
 	exit(EXIT_FAILURE);
 }

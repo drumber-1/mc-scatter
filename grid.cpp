@@ -95,7 +95,7 @@ Grid::~Grid(){
 
 void Grid::output_slices(std::string data_location, unsigned int sliced_dim) const {
 	if(sliced_dim > 2){
-		if(procRank == 0){
+		if(para::get_process_rank() == 0){
 			std::cerr << "Cannot slice across dimension " << sliced_dim << std::endl;
 		}
 		return;
@@ -103,14 +103,13 @@ void Grid::output_slices(std::string data_location, unsigned int sliced_dim) con
 	
 	if(!good){
 		//Possible exception here, as this shouldn't happen
-		if(procRank == 0){
+		if(para::get_process_rank() == 0){
 			std::cerr << "Cannot slice, grid is flagged as bad" << std::endl;
 		}
 		return;
 	}
 	
-	if(procRank == 0){
-		
+	if(para::get_process_rank() == 0){
 		//Create folder is it doesn't exist
 		std::string folder_name = data_location + "/slices";
 		struct stat st = {0};

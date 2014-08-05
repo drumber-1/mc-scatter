@@ -94,7 +94,7 @@ string Image::construct_filename(bool global, std::string prefix){
 	if(global) {
 		filename = data_location + "/" + prefix + "/" + prefix + "_" + int_to_string(id, 4) + ".dat";
 	} else {
-		filename = data_location + "/" + prefix + "/" + prefix + "_" + int_to_string(id, 4) + "_p" + int_to_string(procRank, 4) + ".dat";
+		filename = data_location + "/" + prefix + "/" + prefix + "_" + int_to_string(id, 4) + "_p" + int_to_string(para::get_process_rank(), 4) + ".dat";
 	}
 	
 	return filename;
@@ -116,10 +116,10 @@ void Image::add(double x, double y, double z, double weight){
 
 void Image::calculate_column_density(const Grid& grid){
 
-	int bounds[procSize+1];
-	int per_proc = image_npixels[0]/procSize;
-	int remainder = image_npixels[0]%procSize;
-	for(int i = 0; i <= procSize; i++){
+	int bounds[para::get_process_size()+1];
+	int per_proc = image_npixels[0]/(para::get_process_size());
+	int remainder = image_npixels[0]%(para::get_process_size());
+	for(int i = 0; i <= para::get_process_size(); i++){
 		bounds[i] = i*per_proc;
 		if(i < remainder){
 			bounds[i] += i;
@@ -128,7 +128,7 @@ void Image::calculate_column_density(const Grid& grid){
 		}
 	}
 
-	for(int i = bounds[procRank]; i < bounds[procRank+1]; i++){
+	for(int i = bounds[para::get_process_rank()]; i < bounds[para::get_process_rank()+1]; i++){
 		for(int j = 0; j < image_npixels[1]; j++){
 			double ximage = image_left[0] + i*image_pixel_spacing[0];
 			double yimage = image_left[1] + j*image_pixel_spacing[1];
@@ -167,7 +167,7 @@ void Image::output_global_image(std::string prefix){
 		MPI_Reduce(image[i], g_image[i], image_npixels[1], MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 	}
 	
-	if(procRank == 0) {
+	if(para::get_process_rank() == 0) {
 		ofstream fout;
 		string fname = construct_filename(true, prefix);
 		fout.open(fname.c_str());

@@ -1,26 +1,33 @@
-#define PARA
-
 #include <mpi.h>
 #include "para.h"
 
-#undef PARA
+int proc_rank, proc_size;
 
-void init_para(int argc, char *argv[]);
-int global_sum(int val);
-void dispose_para();
-
-void init_para(int argc, char *argv[]){
+void para::init_para(int argc, char *argv[]){
 	MPI_Init(&argc, &argv);
-	MPI_Comm_rank(MPI_COMM_WORLD, &procRank);
-	MPI_Comm_size(MPI_COMM_WORLD, &procSize);
+	MPI_Comm_rank(MPI_COMM_WORLD, &proc_rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &proc_size);
 }
 
-int global_sum(int val){
+int para::global_sum(int val){
 	int g_val = 0.0;
 	MPI_Reduce(&val, &g_val, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 	return g_val;
 }
 
-void dispose_para(){
+void para::barrier(){
+	MPI_Barrier(MPI_COMM_WORLD);
+}
+
+void para::dispose_para(){
 	MPI_Finalize();
 }
+	
+int para::get_process_rank(){
+	return proc_rank;
+}
+
+int para::get_process_size(){
+	return proc_size;
+}
+

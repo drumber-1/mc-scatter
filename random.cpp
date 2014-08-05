@@ -10,7 +10,7 @@ double rand_phi();
 double rand_theta();
 
 void init_random(){
-	srand(time(NULL)*(procRank+1));
+	srand(time(NULL)*(para::get_process_rank()+1));
 }
 
 double rand_double(){

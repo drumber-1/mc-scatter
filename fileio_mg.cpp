@@ -20,7 +20,7 @@ extern double string_to_double(const std::string& s);
 //TODO: Add re-griding for arbitrary cell spacings
 Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parameters){
 
-	if(procRank == 0){
+	if(para::get_process_rank() == 0){
 		std::cout << "Opening file: " << filename << std::endl;
 	}
 
@@ -30,7 +30,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 	meta_file.open(meta_filename.c_str());
 	
 	if(!meta_file.is_open()){
-		if(procRank == 0){
+		if(para::get_process_rank() == 0){
 			std::cerr << "Could not open metadata file: " << meta_filename << std::endl;
 		}
 		return Grid(false);
@@ -56,13 +56,13 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 	}
 	
 	if(grid_spacing < 0){
-		if(procRank == 0){
+		if(para::get_process_rank() == 0){
 			std::cerr << "Grid spacing could not be read correctly" << std::endl;
 		}
 		return Grid(false);
 	}
 	if(n_levels < 0){
-		if(procRank == 0){
+		if(para::get_process_rank() == 0){
 			std::cerr << "Number of levels could not be read correctly" << std::endl;
 		}
 		return Grid(false);
@@ -80,7 +80,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 	//Level 1 should be maximally refined, so skip level 0
 	for(int ilev = 1; ilev < n_levels - 1; ilev++){
 		
-		if(procRank == 0){
+		if(para::get_process_rank() == 0){
 			std::cout << "Processing level " << ilev << std::endl;
 		}
 	
@@ -89,7 +89,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 		level_file.open(level_filename.c_str());
 		
 		if(!level_file.is_open()){
-			if(procRank == 0){
+			if(para::get_process_rank() == 0){
 				std::cerr << "Could not open level file: " << level_file << std::endl;
 			}
 			return Grid(false);
@@ -139,7 +139,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 		}
 		level_file.close();
 		
-		if(procRank == 0){
+		if(para::get_process_rank() == 0){
 			std::cout << data_points << " data points on level " << ilev << std::endl;
 		}
 		
