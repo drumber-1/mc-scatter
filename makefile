@@ -2,7 +2,12 @@ CPP = mpic++
 CPPFLAGS = -std=c++11 -lm -Wall -L/usr/lib64
 LFLAGS = -Wall -pg -lreadline
 
-OBJS = main.o para.o random.o grid.o photon.o image.o util.o fileio_mg.o console.o problem.o mcscatter.o
+BINDIR = ./bin
+SRCDIR = ./src
+BUILDDIR = ./build
+
+OBJS_NAMES = main.o para.o random.o grid.o photon.o image.o util.o fileio_mg.o console.o problem.o mcscatter.o
+OBJS = $(addprefix $(BUILDDIR)/, $(OBJS_NAMES))
 
 all: CPPFLAGS += -O2
 all: scatter
@@ -14,10 +19,12 @@ prof: CPPFLAGS += -pg -O2
 prof: scatter
 
 scatter : $(OBJS)
-	$(CPP) $(LFLAGS) $(OBJS) -o scatter
+	$(CPP) $(LFLAGS) $(OBJS) -o $(BINDIR)/scatter
 
-%.o : %.cpp
-	$(CPP) $(CPPFLAGS) $(INCLUDE) -c $<
+./$(BUILDDIR)/%.o : $(SRCDIR)/%.cpp
+	@mkdir -p $(@D)
+	$(CPP) $(CPPFLAGS) -c $< -o $@
 	
 clean:
-	rm -f *.o scatter
+	@echo "Cleaning..."
+	rm -f $(BUILDDIR)/*.o $(BINDIR)/scatter
