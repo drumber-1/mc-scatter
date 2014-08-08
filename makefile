@@ -1,6 +1,6 @@
 CPP = mpic++
 CPPFLAGS = -std=c++11 -lm -Wall -L/usr/lib64
-LFLAGS = -Wall -pg -lreadline
+LFLAGS = -Wall -lreadline
 
 BINDIR = ./bin
 SRCDIR = ./src
@@ -16,9 +16,11 @@ debug: CPPFLAGS += -g -O0
 debug: scatter
 
 prof: CPPFLAGS += -pg -O2
+prof: LFLAGS += -pg
 prof: scatter
 
 scatter : $(OBJS)
+	@mkdir -p $(BINDIR)
 	$(CPP) $(LFLAGS) $(OBJS) -o $(BINDIR)/scatter
 
 ./$(BUILDDIR)/%.o : $(SRCDIR)/%.cpp
