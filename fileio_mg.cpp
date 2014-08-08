@@ -6,6 +6,7 @@
 #include "fileio_mg.h"
 #include "grid.h"
 #include "para.h"
+#include "util.h"
 
 //This is a custom file format make of collection of files
 //It consists of:
@@ -13,11 +14,7 @@
 //	rd_lev_XX.rho binary files, containing data values in X, Y, Z, rho order in double precision
 //XX is the grid level to which the file refers to. The number of these files is specified in metadata.txt
 
-extern std::string int_to_string(int x, int width);
-extern double string_to_double(const std::string& s);
-
 //Ignores boundaries in grid_parameters
-//TODO: Add re-griding for arbitrary cell spacings
 Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parameters){
 
 	if(para::get_process_rank() == 0){
@@ -33,7 +30,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 		if(para::get_process_rank() == 0){
 			std::cerr << "Could not open metadata file: " << meta_filename << std::endl;
 		}
-		return Grid(false);
+		return Grid();
 	}
 	
 	//These are the variables we are looking for in the metadata
@@ -49,9 +46,9 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 		std::string var = line.substr(sep_pos+1);
 		
 		if(var_name.compare("gridspacing_fine0") == 0){
-			grid_spacing = string_to_double(var);
+			grid_spacing = util::string_to_double(var);
 		} else if(var_name.compare("levels") == 0){
-			n_levels = string_to_double(var);
+			n_levels = util::string_to_double(var);
 		}
 	}
 	
@@ -59,13 +56,13 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 		if(para::get_process_rank() == 0){
 			std::cerr << "Grid spacing could not be read correctly" << std::endl;
 		}
-		return Grid(false);
+		return Grid();
 	}
 	if(n_levels < 0){
 		if(para::get_process_rank() == 0){
 			std::cerr << "Number of levels could not be read correctly" << std::endl;
 		}
-		return Grid(false);
+		return Grid();
 	}
 	
 	GridParameters gp;
@@ -85,14 +82,14 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 		}
 	
 		std::ifstream level_file;
-		std::string level_filename = filename + "/rd_lev_" + int_to_string(ilev, 2) + ".rho";
+		std::string level_filename = filename + "/rd_lev_" + util::int_to_string(ilev, 2) + ".rho";
 		level_file.open(level_filename.c_str());
 		
 		if(!level_file.is_open()){
 			if(para::get_process_rank() == 0){
 				std::cerr << "Could not open level file: " << level_file << std::endl;
 			}
-			return Grid(false);
+			return Grid();
 		}
 		
 		//Number of the finest cells (a cell on level n_levels) that will fit across the side of one cell on level ilev

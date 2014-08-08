@@ -2,23 +2,16 @@
 #include <iostream>
 #include <iomanip>
 #include "photon.h"
-#include "param.h"
+#include "random.h"
 #include "grid.h"
 
 std::vector<double> get_direction(double theta, double phi);
 
-extern double rand_double();
-extern double rand_tau();
-extern double rand_phi();
-extern double rand_theta();
-
-extern double get_rho(double x, double y, double z);
-
 extern void dispose();
 
 Photon::Photon(double x, double y, double z){
-	double theta = rand_theta();
-	double phi = rand_phi();
+	double theta = random_gen::rand_theta();
+	double phi = random_gen::rand_phi();
 	
 	init(x, y, z, theta, phi, false);
 }
@@ -36,7 +29,7 @@ void Photon::init(double x, double y, double z, double ang1, double ang2, bool s
 	if(scan){
 		tau_target = 1.0e99;
 	} else {
-		tau_target = rand_tau();
+		tau_target = random_gen::rand_tau();
 	}
 	tau_cur = 0.0;
 	absorbed = false;
@@ -48,9 +41,9 @@ void Photon::init(double x, double y, double z, double ang1, double ang2, bool s
 }
 
 void Photon::scatter(){
-	tau_target = rand_tau();
-	double phi = rand_phi();
-	double theta = rand_theta();
+	tau_target = random_gen::rand_tau();
+	double phi = random_gen::rand_phi();
+	double theta = random_gen::rand_theta();
 	
 	dir = get_direction(theta, phi);
 	
@@ -127,12 +120,12 @@ void Photon::update(const Grid& grid){
 	}
 	
 	double rho = grid.get_rho(midpoint);
-	double dtau = rho*opacity*next_face_dist_min;
+	double dtau = rho*grid.get_opacity()*next_face_dist_min;
 	
 	if(dtau + tau_cur > tau_target && !is_scan){ //Going to interact in this cell
 		double ds = next_face_dist_min*(tau_target - tau_cur)/(dtau);
 		move(ds);
-		interact();
+		interact(grid.get_albedo());
 	} else { //Keep going!
 		tau_cur += dtau;
 		move(next_face_dist_min);
@@ -150,8 +143,8 @@ void Photon::move(double d){
 	}
 }
 
-void Photon::interact(){
-	if(rand_double() <= albedo){ //Scatter
+void Photon::interact(double albedo){
+	if(random_gen::rand_double() <= albedo){ //Scatter
 		scatter();
 	} else { //Absorb
 		absorbed = true;

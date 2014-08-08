@@ -36,12 +36,15 @@ Console::Console(std::string inital_prompt) : prompt(inital_prompt), command_map
 }
 
 Console::~Console(){
-	//?
 }
 
 Console& Console::get_instance(){
 	static Console instance("mc-scatter> ");
 	return instance;
+}
+
+void Console::register_command(const std::string& cmd, CommandFunction function) {
+	command_map[cmd] = function;
 }
 
 std::vector<std::string> Console::get_commands() const {

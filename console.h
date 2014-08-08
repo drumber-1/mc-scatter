@@ -11,8 +11,12 @@ class Console {
 			Error = 1
 		};
 		
+		//A command function accepts a vector of strings as its arguments, and represents a single command
+		using CommandFunction = std::function<ReturnCode(const std::vector<std::string> &)>;
+		
 		static Console& get_instance();
 		std::vector<std::string> get_commands() const;
+		void register_command(const std::string& cmd, CommandFunction function);
 		ReturnCode run_command(const std::string& command);
 		ReturnCode run_script(const std::string& filename);
 		ReturnCode read_line();
@@ -20,10 +24,8 @@ class Console {
 		Console(std::string prompt);
 		~Console();
 		Console(const Console&);
-		void operator=(const Console&);
+		void operator=(const Console&);		
 		
-		//A command function accepts a vector of strings as its arguments, and represents a single command
-		using CommandFunction = std::function<ReturnCode(const std::vector<std::string> &)>;
 		//Maps strings (taken from stdin from user) to the functions to execute
 		using CommandMap = std::unordered_map<std::string, CommandFunction>;
 		

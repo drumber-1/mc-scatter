@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 #include "grid.h"
 
@@ -6,7 +8,7 @@ class Photon {
 		double tau_target; //Total optical depth this photon will travel before interacting
 		double tau_cur; //Total integrated optical depth so far
 		void move(double);
-		void interact();
+		void interact(double albedo);
 		void scatter();
 		void init(double, double, double, double, double, bool);
 	public:

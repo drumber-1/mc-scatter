@@ -8,13 +8,11 @@
 #include "grid.h"
 #include "para.h"
 #include "photon.h"
-#include "param.h"
+#include "util.h"
 
 #undef IMAGE
 
-using namespace std;
-
-extern string int_to_string(int n, int width);
+int Image::nimages = 0;
 
 //Decides the best grid resolution and size based on the grid parameters
 //Is very naive, and just copies X & Y resolution/size. This is not ideal
@@ -89,12 +87,12 @@ void Image::init(double theta, double phi, const GridParameters& gp){
 	
 }
 
-string Image::construct_filename(bool global, std::string prefix){
-	string filename;
+std::string Image::construct_filename(std::string dir, std::string prefix, bool global){
+	std::string filename;
 	if(global) {
-		filename = data_location + "/" + prefix + "/" + prefix + "_" + int_to_string(id, 4) + ".dat";
+		filename = dir + "/" + prefix + "/" + prefix + "_" + util::int_to_string(id, 4) + ".dat";
 	} else {
-		filename = data_location + "/" + prefix + "/" + prefix + "_" + int_to_string(id, 4) + "_p" + int_to_string(para::get_process_rank(), 4) + ".dat";
+		filename = dir + "/" + prefix + "/" + prefix + "_" +  util::int_to_string(id, 4) + "_p" +  util::int_to_string(para::get_process_rank(), 4) + ".dat";
 	}
 	
 	return filename;
@@ -157,7 +155,7 @@ void Image::calculate_column_density(const Grid& grid){
 }
 
 //TODO Add header
-void Image::output_global_image(std::string prefix){
+void Image::output_global_image(std::string dir, std::string prefix){
 		
 	// Create global image
 	double g_image[image_npixels[0]][image_npixels[1]];
@@ -168,38 +166,38 @@ void Image::output_global_image(std::string prefix){
 	}
 	
 	if(para::get_process_rank() == 0) {
-		ofstream fout;
-		string fname = construct_filename(true, prefix);
+		std::ofstream fout;
+		std::string fname = construct_filename(dir, prefix, true);
 		fout.open(fname.c_str());
 		if(fout.good()) {
 			for(int j = 0; j < image_npixels[1]; j++){
 				for(int i = 0; i < image_npixels[0]; i++){
-					fout << i << "\t" << j << "\t" << g_image[i][j] << endl;
+					fout << i << "\t" << j << "\t" << g_image[i][j] << "\n";
 				}
 			}
 			fout.close();
 		} else {
-			cerr << "Could not open output file: " << fname << endl;
+			std::cerr << "Could not open output file: " << fname << "\n";
 		}
 	}
 	
 }
 
 //x axes is inner loop so a 1D array of pixel values can be reshaped more easily
-void Image::output_local_image(std::string prefix){
-	ofstream fout;
-	string fname = construct_filename(false, prefix);
+void Image::output_local_image(std::string dir, std::string prefix){
+	std::ofstream fout;
+	std::string fname = construct_filename(dir, prefix, false);
 			
 	fout.open(fname.c_str());
 	if(fout.good()) {
 		for(int j = 0; j < image_npixels[1]; j++){
 			for(int i = 0; i < image_npixels[0]; i++){
-				fout << i << "\t" << j << "\t" << image[i][j] << endl;
+				fout << i << "\t" << j << "\t" << image[i][j] << "\n";
 			}				
 		}
 		fout.close();
 	} else {
-		cerr << "Could not open output file " << fname << endl;
+		std::cerr << "Could not open output file " << fname << "\n";
 	}		
 }
 
@@ -228,7 +226,8 @@ int Image::get_npixels(int dim){
 }
 
 void Image::print_info(){
-	cout << "Image id: " << id << endl;
+	std::cout << "Image id: " << id << "\n";
+	std::cout << "\tTheta: " << obs_theta << "\n";
+	std::cout << "\tPhi: " << obs_phi << "\n";
 }
-
 

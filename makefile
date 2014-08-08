@@ -2,7 +2,7 @@ CPP = mpic++
 CPPFLAGS = -std=c++11 -lm -Wall -L/usr/lib64
 LFLAGS = -Wall -pg -lreadline
 
-OBJS = main.o para.o random.o grid.o photon.o prob.o image.o util.o fileio_mg.o console.o
+OBJS = main.o para.o random.o grid.o photon.o image.o util.o fileio_mg.o console.o problem.o mcscatter.o
 
 all: CPPFLAGS += -O2
 all: scatter

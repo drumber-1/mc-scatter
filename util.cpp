@@ -2,22 +2,20 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include "util.h"
 
-double toRad(double angle);
-std::string int_to_string(int x, int width);
-double string_to_double(const std::string& s);
 
-double toRad(double angle){
+double util::toRad(double angle){
 	return angle*M_PI/180.0;
 }
 
-std::string int_to_string(int n, int width){
+std::string util::int_to_string(int n, int width){
 	std::stringstream sstm;
 	sstm << std::setw(width) << std::setfill('0') << n;
 	return sstm.str();
 }
 
-double string_to_double(const std::string& s){
+double util::string_to_double(const std::string& s){
 	std::istringstream i(s);
 	double x;
 	if(!(i >> x)){

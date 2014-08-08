@@ -10,18 +10,19 @@ class GridParameters {
 		double right_boundary[3];
 };
 
-//TODO: Add traversal/iterator methods
 class Grid {
 		GridParameters parameters;
 		double ***rho_data;
 		double spacing[3];
-		const bool good; //This set false when a grid is expected to be returned, but a sensible grid cannot be created
+		bool empty;
+		double albedo, opacity;
 	public:
 		Grid(const GridParameters&);
-		Grid(bool);
+		Grid();
 		~Grid();
 		Grid(const Grid&);
 		void output_slices(std::string, unsigned int) const;
+		void clear();
 		bool is_on_grid(const std::vector<double>&) const;
 		bool is_on_grid(const std::vector<int>&) const;
 		std::vector<double> get_position(const std::vector<int>&) const;
@@ -30,7 +31,11 @@ class Grid {
 		double get_rho(const std::vector<int>&) const;
 		void set_rho(const std::vector<int>&, double rho);
 		double get_spacing(int dim) const;
-		bool is_good() const;
+		bool is_empty() const;
 		GridParameters get_parameters() const;
+		double get_albedo() const;
+		void set_albedo(double alb);
+		double get_opacity() const;
+		void set_opacity(double opac);
 };
 

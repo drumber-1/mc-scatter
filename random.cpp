@@ -1,30 +1,25 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include "random.h"
 #include "para.h"
 
-void init_random();
-double rand_double();
-double rand_tau();
-double rand_phi();
-double rand_theta();
-
-void init_random(){
+void random_gen::init(){
 	srand(time(NULL)*(para::get_process_rank()+1));
 }
 
-double rand_double(){
+double random_gen::rand_double(){
 	return (double)rand()/(double)RAND_MAX;
 }
 
-double rand_tau(){
+double random_gen::rand_tau(){
 	return -log(rand_double());
 }
 
-double rand_phi(){
+double random_gen::rand_phi(){
 	return rand_double()*2*M_PI;
 }
 
-double rand_theta(){
+double random_gen::rand_theta(){
 	return acos(2*rand_double() - 1);
 }

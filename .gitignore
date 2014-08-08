@@ -13,6 +13,7 @@
 *.a
 
 *~
-./prob.cpp
-./scatter
-./data
+problem.cpp
+scatter
+data
+problems

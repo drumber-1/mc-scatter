@@ -8,21 +8,21 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "grid.h"
-#include "param.h"
 #include "para.h"
+#include "util.h"
 
-extern std::string int_to_string(int x, int width);
-
-Grid::Grid(bool grid_is_valid) : good(grid_is_valid) {
+Grid::Grid() : empty(true) {
 	for (int i = 0; i < 3; i++) {
 		parameters.ncells[i] = 0;
 		parameters.left_boundary[i] = 0.0;
 		parameters.right_boundary[i] = 0.0;
 	}
+	albedo = 1.0;
+	opacity = 1.0;
 }
 
 
-Grid::Grid(const GridParameters& gp) : good(true) {
+Grid::Grid(const GridParameters& gp) : empty(false) {
 	parameters = gp;
 	
 	for(int i = 0; i < 3; i++){
@@ -48,10 +48,12 @@ Grid::Grid(const GridParameters& gp) : good(true) {
 			}
 		}
 	}
+	albedo = 1.0;
+	opacity = 1.0;
 	
 }
 
-Grid::Grid(const Grid& other) : good(other.good){
+Grid::Grid(const Grid& other) : empty(other.empty){
 	parameters = GridParameters(other.parameters);
 	
 	for(int i = 0; i < 3; i++){
@@ -80,6 +82,10 @@ Grid::Grid(const Grid& other) : good(other.good){
 }
 
 Grid::~Grid(){
+	clear();
+}
+
+void Grid::clear() {
 	for(int i = 0; i < parameters.ncells[0]; i++){
 		for(int j = 0; j < parameters.ncells[1]; j++){
 			delete rho_data[i][j];
@@ -91,6 +97,14 @@ Grid::~Grid(){
 	}
 	
 	delete rho_data;
+	
+	for (int i = 0; i < 3; i++) {
+		parameters.ncells[i] = 0;
+		parameters.left_boundary[i] = 0.0;
+		parameters.right_boundary[i] = 0.0;
+	}
+		
+	empty = true;
 }
 
 void Grid::output_slices(std::string data_location, unsigned int sliced_dim) const {
@@ -101,10 +115,9 @@ void Grid::output_slices(std::string data_location, unsigned int sliced_dim) con
 		return;
 	}
 	
-	if(!good){
-		//Possible exception here, as this shouldn't happen
+	if(empty){
 		if(para::get_process_rank() == 0){
-			std::cerr << "Cannot slice, grid is flagged as bad" << std::endl;
+			std::cerr << "Cannot slice, grid is empty" << std::endl;
 		}
 		return;
 	}
@@ -122,7 +135,7 @@ void Grid::output_slices(std::string data_location, unsigned int sliced_dim) con
 
 		std::cout << "Outputting density slices" << std::endl;
 		for(int i = 0; i < parameters.ncells[sliced_dim]; i++){
-			std::string filename = data_location + "/slices/slice" + "_" + int_to_string(i, 4) + ".dat";
+			std::string filename = data_location + "/slices/slice" + "_" + util::int_to_string(i, 4) + ".dat";
 			std::ofstream fout;
 			fout.open(filename.c_str());
 			
@@ -215,12 +228,28 @@ double Grid::get_spacing(int dim) const{
 	return spacing[dim];
 }
 
-bool Grid::is_good() const {
-	return good;
+bool Grid::is_empty() const {
+	return empty;
 }
 
 GridParameters Grid::get_parameters() const {
 	return parameters;
+}
+
+double Grid::get_albedo() const {
+	return albedo;
+}
+
+void Grid::set_albedo(double alb) {
+	albedo = alb;
+}
+
+double Grid::get_opacity() const {
+	return opacity;
+}
+
+void Grid::set_opacity(double opac) {
+	opacity = opac;
 }
 
 
