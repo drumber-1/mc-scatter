@@ -21,8 +21,9 @@ class Grid {
 		Grid();
 		~Grid();
 		Grid(const Grid&);
-		void output_slices(std::string, unsigned int) const;
 		void clear();
+		void output_slices(std::string, unsigned int) const;
+		void print_info() const;
 		bool is_on_grid(const std::vector<double>&) const;
 		bool is_on_grid(const std::vector<int>&) const;
 		std::vector<double> get_position(const std::vector<int>&) const;

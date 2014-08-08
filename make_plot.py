@@ -15,7 +15,7 @@ def parseArg(argv):
 	return inputfile
 	
 
-def do_plot(inputfile, log = True, removeAxes = True):
+def do_plot(inputfile, log = False, removeAxes = True):
 	
 	#Get data
 	try:
@@ -52,9 +52,6 @@ def do_plot(inputfile, log = True, removeAxes = True):
 			zmin = n
 		if n > zmax and not np.isinf(n):
 			zmax = n
-	
-	zmin = -5
-	zmax = 0
 	
 	if removeAxes:
 		fig = plt.figure(frameon=False)

@@ -163,6 +163,23 @@ void Grid::output_slices(std::string data_location, unsigned int sliced_dim) con
 	}
 }
 
+void Grid::print_info() const {
+	if (para::get_process_rank() == 0) {
+	
+		if (empty) {
+			std::cout << "Grid is empty" << "\n";
+			return;
+		}
+		std::cout << "Grid has " << parameters.ncells[0] << "x"
+		                         << parameters.ncells[1] << "x"
+		                         << parameters.ncells[2] << " cells\n";
+		std::cout << "Dimensions are:\n";
+		for (int i = 0; i < 3; i++) {
+			std::cout << "\t" << parameters.left_boundary[i] << " to " << parameters.right_boundary[i] << "\n";
+		}
+	}
+}
+
 bool Grid::is_on_grid(const std::vector<double>& pos) const {
 	if (pos[0] <= parameters.left_boundary[0] ||
 	    pos[1] <= parameters.left_boundary[1] ||

@@ -1,4 +1,6 @@
 #include <mpi.h>
+#include <string>
+#include <algorithm>
 #include "para.h"
 
 int proc_rank, proc_size;
@@ -13,6 +15,28 @@ int para::global_sum(int val){
 	int g_val = 0.0;
 	MPI_Reduce(&val, &g_val, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 	return g_val;
+}
+
+void para::global_sum(double* in, double* out, int nvalues) {
+	MPI_Reduce(in, out, nvalues, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+}
+
+void para::broadcast(std::string& str) {
+	int str_length = str.size();
+	broadcast(&str_length);
+	char* buff = new char[str_length + 1];
+	if(para::get_process_rank() == 0) {
+		std::copy(str.begin(), str.end(), buff);
+		buff[str_length] = '\0';
+	}
+	//MPI_Bcast(const_cast<char*>(str.c_str()), str_length, MPI_CHAR, 0, MPI_COMM_WORLD);
+	MPI_Bcast(buff, str_length + 1, MPI_CHAR, 0, MPI_COMM_WORLD);
+	str = std::string(buff);
+	delete[] buff;
+}
+
+void para::broadcast(int* val) {
+	MPI_Bcast(val, 1, MPI_INT, 0, MPI_COMM_WORLD);
 }
 
 void para::barrier(){

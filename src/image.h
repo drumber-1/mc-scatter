@@ -12,8 +12,6 @@ class Image {
 		void init(double theta, double phi, const GridParameters& gp);
 		std::string construct_filename(std::string dir, std::string prefix, bool global);
 		static int nimages; //Number of images defined, used to give each image a unique id
-		static std::list<Image> scatter_images;
-		static std::list<Image> colden_images;
 	public:
 		Image (double theta, double phi, const GridParameters& gp);
 		~Image ();
@@ -29,5 +27,4 @@ class Image {
 		double get_spacing(int dim);
 		int get_npixels(int dim);
 		void print_info();
-		static void add_image(double theta, double phi, const GridParameters& gp, std::string type);
 };

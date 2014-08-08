@@ -1,0 +1,3 @@
+namespace commands {
+	void init();
+}

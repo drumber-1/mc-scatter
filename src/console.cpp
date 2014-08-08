@@ -8,6 +8,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "console.h"
+#include "para.h"
 
 Console::Console(std::string inital_prompt) : prompt(inital_prompt), command_map({ {"quit",{}}, {"exit",{}} }) {
 	
@@ -108,18 +109,30 @@ Console::ReturnCode Console::run_script(const std::string& filename){
 }
 
 Console::ReturnCode Console::read_line() {
-	char* input = readline(prompt.c_str());
-	if (!input) {
-		std::cout << "\n";
+	int input_bad = 0;
+	std::string line;
+	if (para::get_process_rank() == 0) {
+		char* input;
+		input = readline(prompt.c_str());
+		if (!input) {
+			std::cout << "\n";
+			input_bad = 1;
+		} else {
+			if (input[0] != '\0') {
+				add_history(input);
+			}
+			line = std::string(input);
+			free(input);
+		}
+	}
+	
+	para::broadcast(&input_bad);
+	
+	if(input_bad == 1) {
 		return ReturnCode::Exit;
 	}
 	
-	if (input[0] != '\0') {
-		add_history(input);
-	}
-	
-	std::string line(input);
-	free(input);
+	para::broadcast(line);
 	
 	return run_command(line);
 }

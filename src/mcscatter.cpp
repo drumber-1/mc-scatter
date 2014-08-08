@@ -11,8 +11,6 @@
 #include "problem.h"
 
 MCScatter::MCScatter() : grid(problem::generate_grid()){
-	albedo = 1.0;
-	opacity = 1.0;
 	data_location = "./data";
 }
 
@@ -34,16 +32,39 @@ void MCScatter::add_image(double theta, double phi, const GridParameters& gp, st
 	}
 }
 
+void MCScatter::add_image(double theta, double phi, std::string type) {
+	add_image(theta, phi, grid.get_parameters(), type);
+}
+
 std::string MCScatter::get_data_location() const {
 	return data_location;
 }
 
-double MCScatter::get_albedo() const {
-	return albedo;
+void MCScatter::set_data_location(const std::string& dl) {
+	data_location = dl;
+	struct stat st = {0};
+	if(stat(dl.c_str(), &st) == -1){
+		mkdir(dl.c_str(), 0700);
+	}
 }
 
-double MCScatter::get_opacity() const {
-	return opacity;
+void MCScatter::print_image_info() {
+	if (para::get_process_rank() == 0) {
+		std::cout << "There are " << scatter_images.size() << " scatter images\n";
+		for(std::list<Image>::iterator img = scatter_images.begin(); img != scatter_images.end(); img++){
+			(*img).print_info();
+		}
+		std::cout << "There are " << colden_images.size() << " column density images\n";
+		for(std::list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
+			(*img).print_info();
+		}	
+	}
+}
+
+void MCScatter::print_misc_info() const {
+	if (para::get_process_rank() == 0) {
+		std::cout << "Data will be saved in " << data_location << "\n";
+	}
 }
 
 void MCScatter::do_scatter_simulation(int n_photons) {
@@ -120,4 +141,25 @@ void MCScatter::do_colden_calculation() {
 		(*img).output_global_image(get_data_location(), "colden");
 		i_img++;
 	}
+}
+
+void MCScatter::clear_grid() {
+	grid.clear();
+}
+
+void MCScatter::set_grid(const Grid& new_grid) {
+	grid.clear();
+	grid = new_grid;
+}
+
+const Grid& MCScatter::get_grid() const {
+	return grid;
+}
+
+const std::list<Image>& MCScatter::get_scatter_images() const {
+	return scatter_images;
+}
+
+const std::list<Image>& MCScatter::get_colden_images() const {
+	return colden_images;
 }

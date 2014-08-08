@@ -4,6 +4,7 @@
 #include "console.h"
 #include "random.h"
 #include "problem.h"
+#include "commands.h"
 
 void dispose(); //Clean up
 void term(); //Exit safely, as failure
@@ -13,15 +14,18 @@ int main(int argc, char *argv[]){
 	para::init_para(argc, argv);
 	random_gen::init();
 	problem::init();
+	commands::init();
 
 	//Ensure the mcscatter object is created
 	MCScatter::get_instance();
 	
+	/*int i = 0;
+	while(i == 0){
+	}*/
+	
 	Console::ReturnCode return_code = Console::ReturnCode::Exit;
 	do {
-		if(para::get_process_rank() == 0){
-			return_code = Console::get_instance().read_line();
-		}
+		return_code = Console::get_instance().read_line();
 	} while(return_code != Console::ReturnCode::Exit);
 	
 	para::barrier();

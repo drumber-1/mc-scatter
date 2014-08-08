@@ -3,7 +3,6 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include <mpi.h>
 #include "image.h"
 #include "grid.h"
 #include "para.h"
@@ -162,7 +161,7 @@ void Image::output_global_image(std::string dir, std::string prefix){
 		
 	//Could be reduced to a single MPI_Reduce call to improve speed if needed
 	for(int i = 0; i < image_npixels[0]; i++){
-		MPI_Reduce(image[i], g_image[i], image_npixels[1], MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+		para::global_sum(image[i], g_image[i], image_npixels[1]);
 	}
 	
 	if(para::get_process_rank() == 0) {

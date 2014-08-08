@@ -12,7 +12,7 @@ Grid problem::generate_grid(){
 
 	GridParameters gp;
 	for(int i = 0; i < 3; i++){
-		gp.ncells[i] = 100;
+		gp.ncells[i] = 500;
 		gp.left_boundary[i] = -2;
 		gp.right_boundary[i] = 2;
 	}
