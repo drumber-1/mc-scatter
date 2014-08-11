@@ -6,7 +6,7 @@
 #include "grid.h"
 
 class FileIOMG : public FileIOInterface {
-	public:
+	private:
 		Grid read_file(std::string, const GridParameters&);
 		void write_file(std::string, const Grid&);
 };

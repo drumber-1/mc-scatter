@@ -5,6 +5,7 @@
 #include "random.h"
 #include "problem.h"
 #include "commands.h"
+#include "fileio.h"
 
 void dispose(); //Clean up
 void term(); //Exit safely, as failure
@@ -15,13 +16,10 @@ int main(int argc, char *argv[]){
 	random_gen::init();
 	problem::init();
 	commands::init();
+	FileIOInterface::init();
 
-	//Ensure the mcscatter object is created
+	//Ensure the mcscatter object is created (and created now)
 	MCScatter::get_instance();
-	
-	/*int i = 0;
-	while(i == 0){
-	}*/
 	
 	Console::ReturnCode return_code = Console::ReturnCode::Exit;
 	do {
