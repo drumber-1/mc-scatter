@@ -16,11 +16,13 @@ class Grid {
 		double spacing[3];
 		bool empty;
 		double albedo, opacity;
+		void init(const Grid& other);
 	public:
 		Grid(const GridParameters&);
 		Grid();
 		~Grid();
 		Grid(const Grid&);
+		Grid& operator=(const Grid& other);
 		void clear();
 		void output_slices(std::string, unsigned int) const;
 		void print_info() const;

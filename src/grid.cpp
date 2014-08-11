@@ -53,8 +53,22 @@ Grid::Grid(const GridParameters& gp) : empty(false) {
 	
 }
 
-Grid::Grid(const Grid& other) : empty(other.empty){
+Grid::Grid(const Grid& other) {
+	init(other);
+}
+
+Grid& Grid::operator=(const Grid& other) {
+	init(other);
+	return *this;
+}
+
+Grid::~Grid(){
+	clear();
+}
+
+void Grid::init(const Grid& other) {
 	parameters = GridParameters(other.parameters);
+	empty = other.empty;
 	
 	for(int i = 0; i < 3; i++){
 		spacing[i] = (parameters.right_boundary[i] - parameters.left_boundary[i])/parameters.ncells[i];
@@ -79,10 +93,6 @@ Grid::Grid(const Grid& other) : empty(other.empty){
 			}
 		}
 	}
-}
-
-Grid::~Grid(){
-	clear();
 }
 
 void Grid::clear() {
