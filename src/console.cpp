@@ -18,10 +18,12 @@ Console::Console(std::string inital_prompt) : prompt(inital_prompt), command_map
 	//Hardcoded commands:
 	//Help command - prints a list of the available commands
 	command_map["help"] = [this](const std::vector<std::string>& input){
-		std::vector<std::string> commands = get_commands();
-		std::cout << "Valid commands are:\n";
-		for (auto& cmd : commands) {
-			std::cout << "\t" << cmd << "\n";
+		if (para::get_process_rank() == 0) {
+			std::vector<std::string> commands = get_commands();
+			std::cout << "Valid commands are:\n";
+			for (auto& cmd : commands) {
+				std::cout << "\t" << cmd << "\n";
+			}
 		}
 		return ReturnCode::Good;
 	};
