@@ -29,7 +29,6 @@ void para::broadcast(std::string& str) {
 		std::copy(str.begin(), str.end(), buff);
 		buff[str_length] = '\0';
 	}
-	//MPI_Bcast(const_cast<char*>(str.c_str()), str_length, MPI_CHAR, 0, MPI_COMM_WORLD);
 	MPI_Bcast(buff, str_length + 1, MPI_CHAR, 0, MPI_COMM_WORLD);
 	str = std::string(buff);
 	delete[] buff;
