@@ -8,8 +8,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "grid.h"
-#include "para.h"
+#include "log.h"
 #include "util.h"
+#include "para.h"
 
 Grid::Grid() : empty(true) {
 	for (int i = 0; i < 3; i++) {
@@ -119,16 +120,12 @@ void Grid::clear() {
 
 void Grid::output_slices(std::string data_location, unsigned int sliced_dim) const {
 	if(sliced_dim > 2){
-		if(para::get_process_rank() == 0){
-			std::cerr << "Cannot slice across dimension " << sliced_dim << std::endl;
-		}
+		logs::err << "Cannot slice across dimension " << sliced_dim << std::endl;
 		return;
 	}
 	
 	if(empty){
-		if(para::get_process_rank() == 0){
-			std::cerr << "Cannot slice, grid is empty" << std::endl;
-		}
+		logs::err << "Cannot slice, grid is empty" << std::endl;
 		return;
 	}
 	
@@ -143,14 +140,14 @@ void Grid::output_slices(std::string data_location, unsigned int sliced_dim) con
 		unsigned int unsliced_dim1 = (sliced_dim + 1) % 3;
 		unsigned int unsliced_dim2 = (sliced_dim + 2) % 3;
 
-		std::cout << "Outputting density slices" << std::endl;
+		logs::out << "Outputting density slices" << std::endl;
 		for(int i = 0; i < parameters.ncells[sliced_dim]; i++){
 			std::string filename = data_location + "/slices/slice" + "_" + util::int_to_string(i, 4) + ".dat";
 			std::ofstream fout;
 			fout.open(filename.c_str());
 			
 			if(!fout.good()) {
-				std::cerr << "Could not open output file: " << filename << std::endl;
+				logs::err << "Could not open output file: " << filename << std::endl;
 				return;
 			}
 		
@@ -167,26 +164,24 @@ void Grid::output_slices(std::string data_location, unsigned int sliced_dim) con
 					fout << j << "\t" << k << "\t" << rho << std::endl;
 				}
 			}
-			std::cout << "Slice " << i + 1 << " of " << parameters.ncells[sliced_dim] << " completed" << "\r";
+			logs::out << "Slice " << i + 1 << " of " << parameters.ncells[sliced_dim] << " completed" << "\r";
 		}
-		std::cout << std::endl;
+		logs::out << std::endl;
 	}
 }
 
 void Grid::print_info() const {
-	if (para::get_process_rank() == 0) {
 	
-		if (empty) {
-			std::cout << "Grid is empty" << "\n";
-			return;
-		}
-		std::cout << "Grid has " << parameters.ncells[0] << "x"
-		                         << parameters.ncells[1] << "x"
-		                         << parameters.ncells[2] << " cells\n";
-		std::cout << "Dimensions are:\n";
-		for (int i = 0; i < 3; i++) {
-			std::cout << "\t" << parameters.left_boundary[i] << " to " << parameters.right_boundary[i] << "\n";
-		}
+	if (empty) {
+		logs::out << "Grid is empty" << "\n";
+		return;
+	}
+	logs::out << "Grid has " << parameters.ncells[0] << "x"
+	                         << parameters.ncells[1] << "x"
+	                         << parameters.ncells[2] << " cells\n";
+	logs::out << "Dimensions are:\n";
+	for (int i = 0; i < 3; i++) {
+		logs::out << "\t" << parameters.left_boundary[i] << " to " << parameters.right_boundary[i] << "\n";
 	}
 }
 

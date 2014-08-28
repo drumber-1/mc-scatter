@@ -1,11 +1,11 @@
 #include <cstdlib>
 #include "mcscatter.h"
-#include "para.h"
 #include "console.h"
 #include "random.h"
 #include "problem.h"
 #include "commands.h"
 #include "fileio.h"
+#include "log.h"
 
 void dispose(); //Clean up
 void term(); //Exit safely, as failure
@@ -26,7 +26,6 @@ int main(int argc, char *argv[]){
 		return_code = Console::get_instance().read_line();
 	} while(return_code != Console::ReturnCode::Exit);
 	
-	para::barrier();
 	dispose();
 	return 0;
 }

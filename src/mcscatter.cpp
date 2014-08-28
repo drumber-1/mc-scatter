@@ -9,6 +9,7 @@
 #include "image.h"
 #include "para.h"
 #include "problem.h"
+#include "log.h"
 
 MCScatter::MCScatter() : grid(problem::generate_grid()){
 	data_location = "./data";
@@ -26,9 +27,7 @@ void MCScatter::add_image(double theta, double phi, const GridParameters& gp, st
 	} else if (type == "scatter") {
 		scatter_images.push_back(im);
 	} else {
-		if (para::get_process_rank() == 0) {
-			std::cerr << "Invalid image type: " << type << "\n";
-		}
+		logs::err << "Invalid image type: " << type << "\n";
 	}
 }
 
@@ -49,28 +48,22 @@ void MCScatter::set_data_location(const std::string& dl) {
 }
 
 void MCScatter::print_image_info() {
-	if (para::get_process_rank() == 0) {
-		std::cout << "There are " << scatter_images.size() << " scatter images\n";
-		for(std::list<Image>::iterator img = scatter_images.begin(); img != scatter_images.end(); img++){
-			(*img).print_info();
-		}
-		std::cout << "There are " << colden_images.size() << " column density images\n";
-		for(std::list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
-			(*img).print_info();
-		}	
+	logs::out << "There are " << scatter_images.size() << " scatter images\n";
+	for(std::list<Image>::iterator img = scatter_images.begin(); img != scatter_images.end(); img++){
+		(*img).print_info();
+	}
+	logs::out << "There are " << colden_images.size() << " column density images\n";
+	for(std::list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
+		(*img).print_info();
 	}
 }
 
 void MCScatter::print_misc_info() const {
-	if (para::get_process_rank() == 0) {
-		std::cout << "Data will be saved in " << data_location << "\n";
-	}
+	logs::out << "Data will be saved in " << data_location << "\n";
 }
 
 void MCScatter::do_scatter_simulation(int n_photons) {
-	if(para::get_process_rank() == 0){
-		std::cout << "Starting scattering simluation\n";
-	}
+	logs::out << "Starting scattering simluation\n";
 
 	//Create folder if it doesn't exist
 	std::string folder_name = data_location + "/scatter";
@@ -85,7 +78,9 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 		
 		//TODO Improve output info
 		if(i%print_step == 0){
-			std::cout << "Proc " << para::get_process_rank() << ": " << i << " of " << n_photons << " photons\n";
+			logs::out << logs::ProcessFlag::ALL;
+			logs::out << "Proc " << para::get_process_rank() << ": " << i << " of " << n_photons << " photons\n";
+			logs::out.reset_flags();
 		}
 		
 		Photon p = problem::generate_photon();
@@ -120,9 +115,7 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 }
 
 void MCScatter::do_colden_calculation() {
-	if(para::get_process_rank() == 0) {
-		std::cout << "Calculating column densities\n";
-	}
+	logs::out << "Calculating column densities\n";
 	
 	//Create folder if it doesn't exist
 	std::string folder_name = data_location + "/colden";
@@ -134,9 +127,7 @@ void MCScatter::do_colden_calculation() {
 	//Column density calculations
 	int i_img = 1;
 	for(std::list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
-		if(para::get_process_rank() == 0){
-			std::cout << "Column density image: " << i_img << " of " << colden_images.size() << "\n";
-		}
+		logs::out << "Column density image: " << i_img << " of " << colden_images.size() << "\n";
 		(*img).calculate_column_density(grid);
 		(*img).output_global_image(get_data_location(), "colden");
 		i_img++;

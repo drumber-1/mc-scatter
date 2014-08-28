@@ -8,6 +8,7 @@
 #include "para.h"
 #include "photon.h"
 #include "util.h"
+#include "log.h"
 
 #undef IMAGE
 
@@ -176,7 +177,7 @@ void Image::output_global_image(std::string dir, std::string prefix){
 			}
 			fout.close();
 		} else {
-			std::cerr << "Could not open output file: " << fname << "\n";
+			logs::err << "Could not open output file: " << fname << "\n";
 		}
 	}
 	
@@ -196,7 +197,7 @@ void Image::output_local_image(std::string dir, std::string prefix){
 		}
 		fout.close();
 	} else {
-		std::cerr << "Could not open output file " << fname << "\n";
+		logs::err << "Could not open output file " << fname << "\n";
 	}		
 }
 
@@ -225,8 +226,8 @@ int Image::get_npixels(int dim){
 }
 
 void Image::print_info(){
-	std::cout << "Image id: " << id << "\n";
-	std::cout << "\tTheta: " << obs_theta << "\n";
-	std::cout << "\tPhi: " << obs_phi << "\n";
+	logs::out << "Image id: " << id << "\n";
+	logs::out << "\tTheta: " << obs_theta << "\n";
+	logs::out << "\tPhi: " << obs_phi << "\n";
 }
 

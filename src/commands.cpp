@@ -5,7 +5,7 @@
 #include "commands.h"
 #include "mcscatter.h"
 #include "console.h"
-#include "para.h"
+#include "log.h"
 #include "fileio.h"
 #include "util.h"
 
@@ -32,9 +32,7 @@ void commands::init() {
 Console::ReturnCode print_info(std::vector<std::string> input) {
 	
 	if(input.size() != 2) {
-		if(para::get_process_rank() == 0) {
-			std::cout << "Usage: " << input[0] << " grid|image|misc\n";
-		}
+		logs::err << "Usage: " << input[0] << " grid|image|misc\n";
 		return Console::ReturnCode::Error;
 	}
 
@@ -45,9 +43,7 @@ Console::ReturnCode print_info(std::vector<std::string> input) {
 	} else if(input[1] == "misc") {
 		MCScatter::get_instance().print_misc_info();
 	} else {
-		if(para::get_process_rank() == 0) {
-			std::cout << "Usage: " << input[0] << " grid|image|misc\n";
-		}
+		logs::err << "Usage: " << input[0] << " grid|image|misc\n";
 		return Console::ReturnCode::Error;
 	}
 	
@@ -62,9 +58,7 @@ Console::ReturnCode do_slices(std::vector<std::string> input) {
 
 Console::ReturnCode do_scatter(std::vector<std::string> input) {
 	if(input.size() != 2) {
-		if(para::get_process_rank() == 0) {
-			std::cout << "Usage: " << input[0] << " nphotons\n";
-		}
+		logs::err << "Usage: " << input[0] << " nphotons\n";
 		return Console::ReturnCode::Error;
 	}
 	int nphotons = std::stoi(input[1]);
@@ -84,9 +78,7 @@ Console::ReturnCode clear_grid(std::vector<std::string> input) {
 
 Console::ReturnCode set_data_location(std::vector<std::string> input) {
 	if(input.size() != 2) {
-		if(para::get_process_rank() == 0) {
-			std::cout << "Usage: " << input[0] << " dir\n";
-		}
+		logs::err << "Usage: " << input[0] << " dir\n";
 		return Console::ReturnCode::Error;
 	}
 	
@@ -97,9 +89,7 @@ Console::ReturnCode set_data_location(std::vector<std::string> input) {
 
 Console::ReturnCode add_image(std::vector<std::string> input) {
 	if(input.size() != 4) {
-		if(para::get_process_rank() == 0) {
-			std::cout << "Usage: " << input[0] << " colden|scatter theta phi\n";
-		}
+		logs::err << "Usage: " << input[0] << " colden|scatter theta phi\n";
 		return Console::ReturnCode::Error;
 	}
 	
@@ -112,16 +102,12 @@ Console::ReturnCode add_image(std::vector<std::string> input) {
 
 Console::ReturnCode read(std::vector<std::string> input) {
 	if(input.size() != 3) {
-		if(para::get_process_rank() == 0) {
-			std::cout << "Usage: " << input[0] << " filetype filename\n";
-		}
+		logs::err << "Usage: " << input[0] << " filetype filename\n";
 		return Console::ReturnCode::Error;
 	}
 	
 	if(!FileIOInterface::file_type_supported(input[1])) {
-		if (para::get_process_rank() == 0) {
-			std::cout << input[1] << " is unrecognised\n";
-		}
+		logs::err << input[1] << " is an unrecognised filetype\n";
 		return Console::ReturnCode::Error;
 	}
 	

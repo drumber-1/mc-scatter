@@ -5,7 +5,7 @@
 #include <vector>
 #include "fileio_mg.h"
 #include "grid.h"
-#include "para.h"
+#include "log.h"
 #include "util.h"
 
 //This is a custom file format make of collection of files
@@ -17,9 +17,7 @@
 //Ignores boundaries in grid_parameters
 Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parameters){
 
-	if(para::get_process_rank() == 0){
-		std::cout << "Opening file: " << filename << std::endl;
-	}
+	logs::out << "Opening file: " << filename << std::endl;
 
 	//First get the relevant metadata
 	std::ifstream meta_file;
@@ -27,9 +25,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 	meta_file.open(meta_filename.c_str());
 	
 	if(!meta_file.is_open()){
-		if(para::get_process_rank() == 0){
-			std::cerr << "Could not open metadata file: " << meta_filename << std::endl;
-		}
+		logs::err << "Could not open metadata file: " << meta_filename << std::endl;
 		return Grid();
 	}
 	
@@ -53,15 +49,11 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 	}
 	
 	if(grid_spacing < 0){
-		if(para::get_process_rank() == 0){
-			std::cerr << "Grid spacing could not be read correctly" << std::endl;
-		}
+		logs::err << "Grid spacing could not be read correctly" << std::endl;
 		return Grid();
 	}
 	if(n_levels < 0){
-		if(para::get_process_rank() == 0){
-			std::cerr << "Number of levels could not be read correctly" << std::endl;
-		}
+		logs::err << "Number of levels could not be read correctly" << std::endl;
 		return Grid();
 	}
 	
@@ -77,18 +69,14 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 	//Level 1 should be maximally refined, so skip level 0
 	for(int ilev = 1; ilev < n_levels - 1; ilev++){
 		
-		if(para::get_process_rank() == 0){
-			std::cout << "Processing level " << ilev << std::endl;
-		}
+		logs::out << "Processing level " << ilev << std::endl;
 	
 		std::ifstream level_file;
 		std::string level_filename = filename + "/rd_lev_" + util::int_to_string(ilev, 2) + ".rho";
 		level_file.open(level_filename.c_str());
 		
 		if(!level_file.is_open()){
-			if(para::get_process_rank() == 0){
-				std::cerr << "Could not open level file: " << level_file << std::endl;
-			}
+			logs::err << "Could not open level file: " << level_file << std::endl;
 			return Grid();
 		}
 		
@@ -136,10 +124,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 		}
 		level_file.close();
 		
-		if(para::get_process_rank() == 0){
-			std::cout << data_points << " data points on level " << ilev << std::endl;
-		}
-		
+		logs::out << data_points << " data points on level " << ilev << std::endl;
 	}
 	
 	return grid;

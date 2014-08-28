@@ -9,6 +9,7 @@
 #include <readline/history.h>
 #include "console.h"
 #include "para.h"
+#include "log.h"
 
 Console::Console(std::string inital_prompt) : prompt(inital_prompt), command_map({ {"quit",{}}, {"exit",{}} }) {
 	
@@ -18,12 +19,10 @@ Console::Console(std::string inital_prompt) : prompt(inital_prompt), command_map
 	//Hardcoded commands:
 	//Help command - prints a list of the available commands
 	command_map["help"] = [this](const std::vector<std::string>& input){
-		if (para::get_process_rank() == 0) {
-			std::vector<std::string> commands = get_commands();
-			std::cout << "Valid commands are:\n";
-			for (auto& cmd : commands) {
-				std::cout << "\t" << cmd << "\n";
-			}
+		std::vector<std::string> commands = get_commands();
+		logs::out << "Valid commands are:\n";
+		for (auto& cmd : commands) {
+			logs::out << "\t" << cmd << "\n";
 		}
 		return ReturnCode::Good;
 	};
@@ -31,7 +30,7 @@ Console::Console(std::string inital_prompt) : prompt(inital_prompt), command_map
 	//Run command - executes all commands in a given file
 	command_map["run"] = [this](const std::vector<std::string>& input) {
 		if (input.size() < 2) {
-			std::cout << "Usage: " << input[0] << " <script name>\n";
+			logs::err << "Usage: " << input[0] << " <script name>\n";
 			return ReturnCode::Error;
 		}
 		return run_script(input[1]);
@@ -86,7 +85,7 @@ Console::ReturnCode Console::run_command(const std::string& command) {
 Console::ReturnCode Console::run_script(const std::string& filename){
 	std::ifstream file_input(filename);
 	if(!file_input.good()){
-		std::cerr << "Could not open script: " << filename << "\n";
+		logs::err << "Could not open script: " << filename << "\n";
 		return ReturnCode::Error;
 	}
 	
@@ -99,7 +98,7 @@ Console::ReturnCode Console::run_script(const std::string& filename){
 			//Skip comments
 			continue;
 		}
-		std::cout << "[" << counter << "] " << command << '\n';
+		logs::out << "[" << counter << "] " << command << '\n';
 		result = run_command(command);
 		if (result != ReturnCode::Good) {
 			return result;
@@ -117,7 +116,7 @@ Console::ReturnCode Console::read_line() {
 		char* input;
 		input = readline(prompt.c_str());
 		if (!input) {
-			std::cout << "\n";
+			logs::out << "\n";
 			input_bad = 1;
 		} else {
 			if (input[0] != '\0') {
