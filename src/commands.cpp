@@ -128,14 +128,17 @@ Console::ReturnCode read(std::vector<std::string> input) {
 	MCScatter::get_instance().clear_grid();
 	
 	//These grid parameters determine the maximum number of cells to use
+	//TODO: Use a default gridparameters from problem.cpp
 	GridParameters gp;
 	for(int i = 0; i < 3; i++){
 		gp.ncells[i] = 500;
 		gp.left_boundary[i] = -2;
 		gp.right_boundary[i] = 2;
 	}
-		
-	Grid grid = FileIOInterface::read_file(input[1], input[2], gp);
+	
+	std::string full_path = MCScatter::get_instance().get_data_location() + std::string("/") + input[2];
+	
+	Grid grid = FileIOInterface::read_file(input[1], full_path, gp);
 	MCScatter::get_instance().set_grid(grid);
 	return Console::ReturnCode::Good;
 }
