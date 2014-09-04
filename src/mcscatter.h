@@ -25,6 +25,7 @@ class MCScatter {
 		void do_scatter_simulation(int n_photons);
 		void do_colden_calculation();
 		void clear_grid();
+		void clear_images();
 		void set_grid(const Grid& new_grid);
 		const Grid& get_grid() const;
 		const std::list<Image>& get_scatter_images() const;

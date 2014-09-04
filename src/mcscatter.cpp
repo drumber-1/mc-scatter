@@ -112,6 +112,7 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 		//(*img).output_local_image("scatter");
 		(*img).output_global_image(get_data_location(), "scatter");
 	}
+	scatter_images.clear();
 }
 
 void MCScatter::do_colden_calculation() {
@@ -132,10 +133,16 @@ void MCScatter::do_colden_calculation() {
 		(*img).output_global_image(get_data_location(), "colden");
 		i_img++;
 	}
+	colden_images.clear();
 }
 
 void MCScatter::clear_grid() {
 	grid.clear();
+}
+
+void MCScatter::clear_images() {
+	colden_images.clear();
+	scatter_images.clear();
 }
 
 void MCScatter::set_grid(const Grid& new_grid) {

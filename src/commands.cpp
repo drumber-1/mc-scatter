@@ -13,7 +13,7 @@ Console::ReturnCode print_info(std::vector<std::string> input);
 Console::ReturnCode do_slices(std::vector<std::string> input);
 Console::ReturnCode do_scatter(std::vector<std::string> input);
 Console::ReturnCode do_colden(std::vector<std::string> input);
-Console::ReturnCode clear_grid(std::vector<std::string> input);
+Console::ReturnCode clear(std::vector<std::string> input);
 Console::ReturnCode set_data_location(std::vector<std::string> input);
 Console::ReturnCode add_image(std::vector<std::string> input);
 Console::ReturnCode read(std::vector<std::string> input);
@@ -23,7 +23,7 @@ void commands::init() {
 	Console::get_instance().register_command("slice", do_slices);
 	Console::get_instance().register_command("colden", do_colden);
 	Console::get_instance().register_command("scatter", do_scatter);
-	Console::get_instance().register_command("clear", clear_grid);
+	Console::get_instance().register_command("clear", clear);
 	Console::get_instance().register_command("dataloc", set_data_location);
 	Console::get_instance().register_command("addimage", add_image);
 	Console::get_instance().register_command("read", read);
@@ -32,18 +32,18 @@ void commands::init() {
 Console::ReturnCode print_info(std::vector<std::string> input) {
 	
 	if(input.size() != 2) {
-		logs::err << "Usage: " << input[0] << " grid|image|misc\n";
+		logs::err << "Usage: " << input[0] << " grid|images|misc\n";
 		return Console::ReturnCode::Error;
 	}
 
 	if(input[1] == "grid") {
 		MCScatter::get_instance().get_grid().print_info();
-	} else if(input[1] == "image") {
+	} else if(input[1] == "images") {
 		MCScatter::get_instance().print_image_info();
 	} else if(input[1] == "misc") {
 		MCScatter::get_instance().print_misc_info();
 	} else {
-		logs::err << "Usage: " << input[0] << " grid|image|misc\n";
+		logs::err << "Usage: " << input[0] << " grid|images|misc\n";
 		return Console::ReturnCode::Error;
 	}
 	
@@ -71,8 +71,22 @@ Console::ReturnCode do_colden(std::vector<std::string> input) {
 	return Console::ReturnCode::Good;
 }
 
-Console::ReturnCode clear_grid(std::vector<std::string> input) {
-	MCScatter::get_instance().clear_grid();
+Console::ReturnCode clear(std::vector<std::string> input) {
+	if(input.size() != 2) {
+		logs::err << "Usage: " << input[0] << " grid|images\n";
+		return Console::ReturnCode::Error;
+	}
+	
+	if(input[1] == "grid") {
+		MCScatter::get_instance().clear_grid();
+	} else if(input[1] == "images") {
+		MCScatter::get_instance().clear_images();
+	} else {
+		logs::err << "Usage: " << input[0] << " grid|images\n";
+		return Console::ReturnCode::Error;
+	}
+
+	
 	return Console::ReturnCode::Good;
 }
 
