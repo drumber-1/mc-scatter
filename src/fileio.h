@@ -11,7 +11,7 @@ class FileIOInterface {
 		static void init();
 		static bool file_type_supported(std::string filetype);
 		static Grid read_file(std::string filetype, std::string filename, const GridParameters& gp);
-		static void write_file(std::string filetype, std::string filename, const GridParameters& gp);
+		static void write_file(std::string filetype, std::string filename, const Grid& grid);
 		virtual ~FileIOInterface() {};
 	private:
 		virtual Grid read_file(std::string, const GridParameters&) = 0; //TODO: Check compiler is optimizing out copying on return

@@ -3,10 +3,13 @@
 #include <cmath>
 #include <string>
 #include <vector>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "fileio_mg.h"
 #include "grid.h"
 #include "log.h"
 #include "util.h"
+#include "para.h"
 
 //This is a custom file format make of collection of files
 //It consists of:
@@ -130,6 +133,73 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 	return grid;
 }
 
+//All the amr data is lost, so this file will be much larger than the original from mg
+//so this function is unless in most cases and is included only for completeness
 void FileIOMG::write_file(std::string filename, const Grid& grid){
+
+	if (para::get_process_rank() != 0) { //Only the master process should output data
+		return;
+	}
+
+	logs::out << "Writing file: " << filename << std::endl;
+	
+	mkdir(filename.c_str(), 0700);
+
+	//First get the relevant metadata
+	std::ofstream meta_file;
+	std::string meta_filename = filename + "/metadata.txt";
+	meta_file.open(meta_filename.c_str());
+	
+	if(!meta_file.is_open()){
+		logs::err << "Could not open metadata file: " << meta_filename << std::endl;
+		return;
+	}
+	
+	meta_file << "time:0\n"; //TODO: Store time and reproduce it here
+	
+	for (int i = 0; i < 3; i++) {
+		meta_file << "bounds" << i << ":"
+		          << grid.get_parameters().left_boundary[i] << ","
+		          << grid.get_parameters().right_boundary[i] << "\n";
+	}
+	
+	meta_file << "levels:1\n";
+	
+	for (int i = 0; i < 3; i++) {
+		meta_file << "gridspacing_course" << i << ":" << grid.get_spacing(i) << "\n";
+	}
+	
+	for (int i = 0; i < 3; i++) {
+		meta_file << "gridspacing_fine" << i << ":" << grid.get_spacing(i) << "\n";
+	}
+	
+	meta_file.close();
+	
+	std::ofstream data_file;
+	std::string data_filename = filename + "/rd_lev_00.rho";
+	data_file.open(data_filename, std::ios::out | std::ios::binary);
+	
+	if(!data_file.is_open()){
+		logs::err << "Could not open data file: " << data_filename << std::endl;
+		return;
+	}
+	
+	for (int i = 0; i < grid.get_parameters().ncells[0]; i++) {
+		for (int j = 0; j < grid.get_parameters().ncells[1]; j++) {
+			for (int k = 0; k < grid.get_parameters().ncells[2]; k++) {
+				std::vector<int> cell {i, j, k};
+				std::vector<double> pos = grid.get_position(cell);
+				double rho = grid.get_rho(cell);
+				
+				for (int id = 0; id < 3; id++) {
+					data_file.write((char*)&(pos[id]), sizeof (double));
+				}
+				data_file.write((char*)&(rho), sizeof (double));
+			}
+		}
+	}
+	
+	data_file.close();
+
 	return;
 }

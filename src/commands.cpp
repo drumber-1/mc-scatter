@@ -13,20 +13,22 @@ Console::ReturnCode print_info(std::vector<std::string> input);
 Console::ReturnCode do_slices(std::vector<std::string> input);
 Console::ReturnCode do_scatter(std::vector<std::string> input);
 Console::ReturnCode do_colden(std::vector<std::string> input);
-Console::ReturnCode clear(std::vector<std::string> input);
+Console::ReturnCode clear_item(std::vector<std::string> input);
 Console::ReturnCode set_data_location(std::vector<std::string> input);
 Console::ReturnCode add_image(std::vector<std::string> input);
 Console::ReturnCode read(std::vector<std::string> input);
+Console::ReturnCode write(std::vector<std::string> input);
 
 void commands::init() {
 	Console::get_instance().register_command("info", print_info);
 	Console::get_instance().register_command("slice", do_slices);
 	Console::get_instance().register_command("colden", do_colden);
 	Console::get_instance().register_command("scatter", do_scatter);
-	Console::get_instance().register_command("clear", clear);
+	Console::get_instance().register_command("clear", clear_item);
 	Console::get_instance().register_command("dataloc", set_data_location);
 	Console::get_instance().register_command("addimage", add_image);
 	Console::get_instance().register_command("read", read);
+	Console::get_instance().register_command("write", write);
 }
 
 Console::ReturnCode print_info(std::vector<std::string> input) {
@@ -71,7 +73,7 @@ Console::ReturnCode do_colden(std::vector<std::string> input) {
 	return Console::ReturnCode::Good;
 }
 
-Console::ReturnCode clear(std::vector<std::string> input) {
+Console::ReturnCode clear_item(std::vector<std::string> input) {
 	if(input.size() != 2) {
 		logs::err << "Usage: " << input[0] << " grid|images\n";
 		return Console::ReturnCode::Error;
@@ -140,6 +142,23 @@ Console::ReturnCode read(std::vector<std::string> input) {
 	
 	Grid grid = FileIOInterface::read_file(input[1], full_path, gp);
 	MCScatter::get_instance().set_grid(grid);
+	return Console::ReturnCode::Good;
+}
+
+Console::ReturnCode write(std::vector<std::string> input) {
+	if(input.size() != 3) {
+		logs::err << "Usage: " << input[0] << " filetype filename\n";
+		return Console::ReturnCode::Error;
+	}
+	
+	if(!FileIOInterface::file_type_supported(input[1])) {
+		logs::err << input[1] << " is an unrecognised filetype\n";
+		return Console::ReturnCode::Error;
+	}
+	
+	std::string full_path = MCScatter::get_instance().get_data_location() + std::string("/") + input[2];
+	
+	FileIOInterface::write_file(input[1], full_path, MCScatter::get_instance().get_grid());
 	return Console::ReturnCode::Good;
 }
 
