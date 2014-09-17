@@ -108,6 +108,7 @@ void Grid::clear() {
 	}
 	
 	delete rho_data;
+	rho_data = nullptr;
 	
 	for (int i = 0; i < 3; i++) {
 		parameters.ncells[i] = 0;
