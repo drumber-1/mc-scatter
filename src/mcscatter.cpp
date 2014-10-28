@@ -49,12 +49,12 @@ void MCScatter::set_data_location(const std::string& dl) {
 
 void MCScatter::print_image_info() {
 	logs::out << "There are " << scatter_images.size() << " scatter images\n";
-	for(std::list<Image>::iterator img = scatter_images.begin(); img != scatter_images.end(); img++){
-		(*img).print_info();
+	for (auto img : scatter_images) {
+		img.print_info();
 	}
 	logs::out << "There are " << colden_images.size() << " column density images\n";
-	for(std::list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
-		(*img).print_info();
+	for (auto img : colden_images) {
+		img.print_info();
 	}
 }
 
@@ -93,24 +93,23 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 			}
 			
 			if(p.scattered){ //Peel of a photon
-				for(std::list<Image>::iterator img = scatter_images.begin(); img != scatter_images.end(); img++){
-					double theta = (*img).get_theta();
-					double phi = (*img).get_phi();
+				for (auto img : scatter_images) {
+					double theta = img.get_theta();
+					double phi = img.get_phi();
 					Photon p_peel = p.peel(theta, phi);
 					while(!p_peel.escaped){
 						p_peel.update(grid);
 					}
 					double weight = exp(-1*p_peel.get_tau_cur());
-					(*img).add(p_peel.pos[0], p_peel.pos[1], p_peel.pos[2], weight);
+					img.add(p_peel.pos[0], p_peel.pos[1], p_peel.pos[2], weight);
 				}
 			}
 		}
 		
 	} //Photons
 	
-	for(std::list<Image>::iterator img = scatter_images.begin(); img != scatter_images.end(); img++){
-		//(*img).output_local_image("scatter");
-		(*img).output_global_image(get_data_location(), "scatter");
+	for (auto img : scatter_images) {
+		img.output_global_image(get_data_location(), "scatter");
 	}
 	scatter_images.clear();
 }
@@ -127,10 +126,10 @@ void MCScatter::do_colden_calculation() {
 
 	//Column density calculations
 	int i_img = 1;
-	for(std::list<Image>::iterator img = colden_images.begin(); img != colden_images.end(); img++){
+	for (auto img : colden_images) {
 		logs::out << "Column density image: " << i_img << " of " << colden_images.size() << "\n";
-		(*img).calculate_column_density(grid);
-		(*img).output_global_image(get_data_location(), "colden");
+		img.calculate_column_density(grid);
+		img.output_global_image(get_data_location(), "colden");
 		i_img++;
 	}
 	colden_images.clear();
