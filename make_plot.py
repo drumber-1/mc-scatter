@@ -1,3 +1,5 @@
+#!/common/software/python/epd-7.2-2-rh3-x86_64/bin/python
+
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.interpolate
@@ -15,7 +17,7 @@ def parseArg(argv):
 	return inputfile
 	
 
-def do_plot(inputfile, log = False, removeAxes = True):
+def do_plot(inputfile, log = True, removeAxes = False):
 	
 	#Get data
 	try:
@@ -52,6 +54,9 @@ def do_plot(inputfile, log = False, removeAxes = True):
 			zmin = n
 		if n > zmax and not np.isinf(n):
 			zmax = n
+			
+	zmin = -5.0
+	zmax = 0.0
 	
 	if removeAxes:
 		fig = plt.figure(frameon=False)

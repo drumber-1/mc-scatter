@@ -22,7 +22,7 @@ bool FileIOInterface::file_type_supported(std::string filetype) {
 
 Grid FileIOInterface::read_file(std::string filetype, std::string filename, const GridParameters& gp) {
 	std::unordered_map<std::string, std::unique_ptr<FileIOInterface>>::iterator it = fileio_map.find(filetype);
-	if(it != end(fileio_map)){
+	if (it != end(fileio_map)) {
 		return (it->second)->read_file(filename, gp);
 	} else {
 		Grid grid;
@@ -32,7 +32,7 @@ Grid FileIOInterface::read_file(std::string filetype, std::string filename, cons
 
 void FileIOInterface::write_file(std::string filetype, std::string filename, const Grid& grid) {
 	std::unordered_map<std::string, std::unique_ptr<FileIOInterface>>::iterator it = fileio_map.find(filetype);
-	if(it != end(fileio_map)){
+	if (it != end(fileio_map)) {
 		return (it->second)->write_file(filename, grid);
 	} else {
 		return;

@@ -8,15 +8,15 @@
 #include "fileio_mg.h"
 #include "problem.h"
 
-void problem::init(){
+void problem::init() {
 }
 
-Grid problem::generate_grid(){
+Grid problem::generate_grid() {
 	Grid grid;
 	return grid;
 }
 
-Photon problem::generate_photon(){
+Photon problem::generate_photon() {
 	Photon p (0, 0, 0);
 	return p;
 }

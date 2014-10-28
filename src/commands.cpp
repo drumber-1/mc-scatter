@@ -33,16 +33,16 @@ void commands::init() {
 
 Console::ReturnCode print_info(std::vector<std::string> input) {
 	
-	if(input.size() != 2) {
+	if (input.size() != 2) {
 		logs::err << "Usage: " << input[0] << " grid|images|misc\n";
 		return Console::ReturnCode::Error;
 	}
 
-	if(input[1] == "grid") {
+	if (input[1] == "grid") {
 		MCScatter::get_instance().get_grid().print_info();
-	} else if(input[1] == "images") {
+	} else if (input[1] == "images") {
 		MCScatter::get_instance().print_image_info();
-	} else if(input[1] == "misc") {
+	} else if (input[1] == "misc") {
 		MCScatter::get_instance().print_misc_info();
 	} else {
 		logs::err << "Usage: " << input[0] << " grid|images|misc\n";
@@ -59,7 +59,7 @@ Console::ReturnCode do_slices(std::vector<std::string> input) {
 }
 
 Console::ReturnCode do_scatter(std::vector<std::string> input) {
-	if(input.size() != 2) {
+	if (input.size() != 2) {
 		logs::err << "Usage: " << input[0] << " nphotons\n";
 		return Console::ReturnCode::Error;
 	}
@@ -74,14 +74,14 @@ Console::ReturnCode do_colden(std::vector<std::string> input) {
 }
 
 Console::ReturnCode clear_item(std::vector<std::string> input) {
-	if(input.size() != 2) {
+	if (input.size() != 2) {
 		logs::err << "Usage: " << input[0] << " grid|images\n";
 		return Console::ReturnCode::Error;
 	}
 	
-	if(input[1] == "grid") {
+	if (input[1] == "grid") {
 		MCScatter::get_instance().clear_grid();
-	} else if(input[1] == "images") {
+	} else if (input[1] == "images") {
 		MCScatter::get_instance().clear_images();
 	} else {
 		logs::err << "Usage: " << input[0] << " grid|images\n";
@@ -93,7 +93,7 @@ Console::ReturnCode clear_item(std::vector<std::string> input) {
 }
 
 Console::ReturnCode set_data_location(std::vector<std::string> input) {
-	if(input.size() != 2) {
+	if (input.size() != 2) {
 		logs::err << "Usage: " << input[0] << " dir\n";
 		return Console::ReturnCode::Error;
 	}
@@ -104,7 +104,7 @@ Console::ReturnCode set_data_location(std::vector<std::string> input) {
 }
 
 Console::ReturnCode add_image(std::vector<std::string> input) {
-	if(input.size() != 4) {
+	if (input.size() != 4) {
 		logs::err << "Usage: " << input[0] << " colden|scatter theta phi\n";
 		return Console::ReturnCode::Error;
 	}
@@ -117,12 +117,12 @@ Console::ReturnCode add_image(std::vector<std::string> input) {
 }
 
 Console::ReturnCode read(std::vector<std::string> input) {
-	if(input.size() != 3) {
+	if (input.size() != 3) {
 		logs::err << "Usage: " << input[0] << " filetype filename\n";
 		return Console::ReturnCode::Error;
 	}
 	
-	if(!FileIOInterface::file_type_supported(input[1])) {
+	if (!FileIOInterface::file_type_supported(input[1])) {
 		logs::err << input[1] << " is an unrecognised filetype\n";
 		return Console::ReturnCode::Error;
 	}
@@ -132,7 +132,7 @@ Console::ReturnCode read(std::vector<std::string> input) {
 	//These grid parameters determine the maximum number of cells to use
 	//TODO: Use a default gridparameters from problem.cpp
 	GridParameters gp;
-	for(int i = 0; i < 3; i++){
+	for (int i = 0; i < 3; i++) {
 		gp.ncells[i] = 500;
 		gp.left_boundary[i] = -2;
 		gp.right_boundary[i] = 2;
@@ -146,12 +146,12 @@ Console::ReturnCode read(std::vector<std::string> input) {
 }
 
 Console::ReturnCode write(std::vector<std::string> input) {
-	if(input.size() != 3) {
+	if (input.size() != 3) {
 		logs::err << "Usage: " << input[0] << " filetype filename\n";
 		return Console::ReturnCode::Error;
 	}
 	
-	if(!FileIOInterface::file_type_supported(input[1])) {
+	if (!FileIOInterface::file_type_supported(input[1])) {
 		logs::err << input[1] << " is an unrecognised filetype\n";
 		return Console::ReturnCode::Error;
 	}

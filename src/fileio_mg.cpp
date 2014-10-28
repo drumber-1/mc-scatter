@@ -18,7 +18,7 @@
 //XX is the grid level to which the file refers to. The number of these files is specified in metadata.txt
 
 //Ignores boundaries in grid_parameters
-Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parameters){
+Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parameters) {
 
 	logs::out << "Opening file: " << filename << std::endl;
 
@@ -27,7 +27,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 	std::string meta_filename = filename + "/metadata.txt";
 	meta_file.open(meta_filename.c_str());
 	
-	if(!meta_file.is_open()){
+	if (!meta_file.is_open()) {
 		logs::err << "Could not open metadata file: " << meta_filename << std::endl;
 		return Grid();
 	}
@@ -36,7 +36,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 	double grid_spacing = -1;
 	int n_levels = -1;
 	
-	while(meta_file.good()){
+	while (meta_file.good()) {
 		std::string line;
 		getline(meta_file, line);
 		
@@ -44,33 +44,33 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 		std::string var_name = line.substr(0, sep_pos);
 		std::string var = line.substr(sep_pos+1);
 		
-		if(var_name.compare("gridspacing_fine0") == 0){
+		if (var_name.compare("gridspacing_fine0") == 0) {
 			grid_spacing = util::string_to_double(var);
-		} else if(var_name.compare("levels") == 0){
+		} else if (var_name.compare("levels") == 0) {
 			n_levels = util::string_to_double(var);
 		}
 	}
 	
-	if(grid_spacing < 0){
+	if (grid_spacing < 0) {
 		logs::err << "Grid spacing could not be read correctly" << std::endl;
 		return Grid();
 	}
-	if(n_levels < 0){
+	if (n_levels < 0) {
 		logs::err << "Number of levels could not be read correctly" << std::endl;
 		return Grid();
 	}
 	
 	GridParameters gp;
-	for(int i = 0; i < 3; i++){
+	for (int i = 0; i < 3; i++) {
 		gp.ncells[i] = grid_parameters.ncells[i];
-		gp.left_boundary[i] = -0.5*gp.ncells[i]*grid_spacing;
-		gp.right_boundary[i] = 0.5*gp.ncells[i]*grid_spacing;
+		gp.left_boundary[i] = -0.5 * gp.ncells[i] * grid_spacing;
+		gp.right_boundary[i] = 0.5 * gp.ncells[i] * grid_spacing;
 	}
 	
 	Grid grid(gp);
 	
 	//Level 1 should be maximally refined, so skip level 0
-	for(int ilev = 1; ilev < n_levels - 1; ilev++){
+	for (int ilev = 1; ilev < n_levels - 1; ilev++) {
 		
 		logs::out << "Processing level " << ilev << std::endl;
 	
@@ -78,7 +78,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 		std::string level_filename = filename + "/rd_lev_" + util::int_to_string(ilev, 2) + ".rho";
 		level_file.open(level_filename.c_str());
 		
-		if(!level_file.is_open()){
+		if (!level_file.is_open()) {
 			logs::err << "Could not open level file: " << level_file << std::endl;
 			return Grid();
 		}
@@ -92,7 +92,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 		std::vector<int> cell_fine(3);
 		
 		//Note: Coordinates from file are cell centres
-		while(!level_file.eof()){
+		while (!level_file.eof()) {
 			double x;
 			double y;
 			double z;
@@ -109,7 +109,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 			cell[1] = fine_cells*floor((y - gp.left_boundary[1])/(grid.get_spacing(1)*fine_cells));
 			cell[2] = fine_cells*floor((z - gp.left_boundary[2])/(grid.get_spacing(2)*fine_cells));
 			
-			if(!grid.is_on_grid(cell)){
+			if (!grid.is_on_grid(cell)) {
 				continue;
 			}
 			
@@ -135,7 +135,7 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 
 //All the amr data is lost, so this file will be much larger than the original from mg
 //so this function is unless in most cases and is included only for completeness
-void FileIOMG::write_file(std::string filename, const Grid& grid){
+void FileIOMG::write_file(std::string filename, const Grid& grid) {
 
 	if (para::get_process_rank() != 0) { //Only the master process should output data
 		return;
@@ -150,7 +150,7 @@ void FileIOMG::write_file(std::string filename, const Grid& grid){
 	std::string meta_filename = filename + "/metadata.txt";
 	meta_file.open(meta_filename.c_str());
 	
-	if(!meta_file.is_open()){
+	if (!meta_file.is_open()) {
 		logs::err << "Could not open metadata file: " << meta_filename << std::endl;
 		return;
 	}
@@ -179,7 +179,7 @@ void FileIOMG::write_file(std::string filename, const Grid& grid){
 	std::string data_filename = filename + "/rd_lev_00.rho";
 	data_file.open(data_filename, std::ios::out | std::ios::binary);
 	
-	if(!data_file.is_open()){
+	if (!data_file.is_open()) {
 		logs::err << "Could not open data file: " << data_filename << std::endl;
 		return;
 	}

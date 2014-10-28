@@ -26,25 +26,25 @@ Grid::Grid() : empty(true) {
 Grid::Grid(const GridParameters& gp) : empty(false) {
 	parameters = gp;
 	
-	for(int i = 0; i < 3; i++){
-		spacing[i] = (parameters.right_boundary[i] - parameters.left_boundary[i])/parameters.ncells[i];
+	for (int i = 0; i < 3; i++) {
+		spacing[i] = (parameters.right_boundary[i] - parameters.left_boundary[i]) / parameters.ncells[i];
 	}
 	
 	rho_data = new double **[parameters.ncells[0]];
 	
-	for(int i = 0; i < parameters.ncells[0]; i++){
+	for (int i = 0; i < parameters.ncells[0]; i++) {
 		rho_data[i] = new double *[parameters.ncells[1]];
 	}
 	
-	for(int i = 0; i < parameters.ncells[0]; i++){
-		for(int j = 0; j < parameters.ncells[1]; j++){
+	for (int i = 0; i < parameters.ncells[0]; i++) {
+		for (int j = 0; j < parameters.ncells[1]; j++) {
 			rho_data[i][j] = new double [parameters.ncells[2]];
 		}
 	}
 	
-	for(int i = 0; i < parameters.ncells[0]; i++){
-		for(int j = 0; j < parameters.ncells[1]; j++){
-			for(int k = 0; k < parameters.ncells[2]; k++){
+	for (int i = 0; i < parameters.ncells[0]; i++) {
+		for (int j = 0; j < parameters.ncells[1]; j++) {
+			for (int k = 0; k < parameters.ncells[2]; k++) {
 				rho_data[i][j][k] = 0;
 			}
 		}
@@ -63,7 +63,7 @@ Grid& Grid::operator=(const Grid& other) {
 	return *this;
 }
 
-Grid::~Grid(){
+Grid::~Grid() {
 	clear();
 }
 
@@ -71,25 +71,25 @@ void Grid::init(const Grid& other) {
 	parameters = GridParameters(other.parameters);
 	empty = other.empty;
 	
-	for(int i = 0; i < 3; i++){
-		spacing[i] = (parameters.right_boundary[i] - parameters.left_boundary[i])/parameters.ncells[i];
+	for (int i = 0; i < 3; i++) {
+		spacing[i] = (parameters.right_boundary[i] - parameters.left_boundary[i]) / parameters.ncells[i];
 	}
 	
 	rho_data = new double **[parameters.ncells[0]];
 	
-	for(int i = 0; i < parameters.ncells[0]; i++){
+	for (int i = 0; i < parameters.ncells[0]; i++) {
 		rho_data[i] = new double *[parameters.ncells[1]];
 	}
 	
-	for(int i = 0; i < parameters.ncells[0]; i++){
-		for(int j = 0; j < parameters.ncells[1]; j++){
+	for (int i = 0; i < parameters.ncells[0]; i++) {
+		for (int j = 0; j < parameters.ncells[1]; j++) {
 			rho_data[i][j] = new double [parameters.ncells[2]];
 		}
 	}
 	
-	for(int i = 0; i < parameters.ncells[0]; i++){
-		for(int j = 0; j < parameters.ncells[1]; j++){
-			for(int k = 0; k < parameters.ncells[2]; k++){
+	for (int i = 0; i < parameters.ncells[0]; i++) {
+		for (int j = 0; j < parameters.ncells[1]; j++) {
+			for (int k = 0; k < parameters.ncells[2]; k++) {
 				rho_data[i][j][k] = other.rho_data[i][j][k];
 			}
 		}
@@ -97,13 +97,13 @@ void Grid::init(const Grid& other) {
 }
 
 void Grid::clear() {
-	for(int i = 0; i < parameters.ncells[0]; i++){
-		for(int j = 0; j < parameters.ncells[1]; j++){
+	for (int i = 0; i < parameters.ncells[0]; i++) {
+		for (int j = 0; j < parameters.ncells[1]; j++) {
 			delete rho_data[i][j];
 		}
 	}
 	
-	for(int i = 0; i < parameters.ncells[0]; i++){
+	for (int i = 0; i < parameters.ncells[0]; i++) {
 		delete rho_data[i];
 	}
 	
@@ -120,21 +120,21 @@ void Grid::clear() {
 }
 
 void Grid::output_slices(std::string data_location, unsigned int sliced_dim) const {
-	if(sliced_dim > 2){
+	if (sliced_dim > 2) {
 		logs::err << "Cannot slice across dimension " << sliced_dim << std::endl;
 		return;
 	}
 	
-	if(empty){
+	if (empty) {
 		logs::err << "Cannot slice, grid is empty" << std::endl;
 		return;
 	}
 	
-	if(para::get_process_rank() == 0){
+	if (para::get_process_rank() == 0) {
 		//Create folder is it doesn't exist
 		std::string folder_name = data_location + "/slices";
 		struct stat st = {0};
-		if(stat(folder_name.c_str(), &st) == -1){
+		if (stat(folder_name.c_str(), &st) == -1) {
 			mkdir(folder_name.c_str(), 0700);
 		}
 	
@@ -142,22 +142,22 @@ void Grid::output_slices(std::string data_location, unsigned int sliced_dim) con
 		unsigned int unsliced_dim2 = (sliced_dim + 2) % 3;
 
 		logs::out << "Outputting density slices" << std::endl;
-		for(int i = 0; i < parameters.ncells[sliced_dim]; i++){
+		for (int i = 0; i < parameters.ncells[sliced_dim]; i++) {
 			std::string filename = data_location + "/slices/slice" + "_" + util::int_to_string(i, 4) + ".dat";
 			std::ofstream fout;
 			fout.open(filename.c_str());
 			
-			if(!fout.good()) {
+			if (!fout.good()) {
 				logs::err << "Could not open output file: " << filename << std::endl;
 				return;
 			}
 		
-			for(int j = 0; j < parameters.ncells[unsliced_dim1]; j++){
-				for(int k = 0; k < parameters.ncells[unsliced_dim2]; k++){
+			for (int j = 0; j < parameters.ncells[unsliced_dim1]; j++) {
+				for (int k = 0; k < parameters.ncells[unsliced_dim2]; k++) {
 					double rho = 0;
-					if(sliced_dim == 0){
+					if (sliced_dim == 0) {
 						rho = rho_data[i][j][k];
-					} else if(sliced_dim == 1){
+					} else if (sliced_dim == 1) {
 						rho = rho_data[k][i][j];
 					} else {
 						rho = rho_data[j][k][i];
@@ -215,7 +215,7 @@ bool Grid::is_on_grid(const std::vector<int>& cell) const {
 std::vector<double> Grid::get_position(const std::vector<int>& cell) const {
 	std::vector<double> pos(3);
 	for (int i = 0; i < 3; i++) {
-		pos[i] = cell[i]*spacing[i] + parameters.left_boundary[i];
+		pos[i] = cell[i] * spacing[i] + parameters.left_boundary[i];
 	}
 	return pos;
 }
@@ -223,7 +223,7 @@ std::vector<double> Grid::get_position(const std::vector<int>& cell) const {
 std::vector<int> Grid::get_cell(const std::vector<double>& pos) const {
 	std::vector<int> cell(3);
 	for (int i = 0; i < 3; i++) {
-		cell[i] = floor((pos[i] - parameters.left_boundary[i])/spacing[i]);
+		cell[i] = floor((pos[i] - parameters.left_boundary[i]) / spacing[i]);
 	}
 	return cell;
 }
@@ -247,7 +247,7 @@ void Grid::set_rho(const std::vector<int>& cell, double rho) {
 	}
 }
 
-double Grid::get_spacing(int dim) const{
+double Grid::get_spacing(int dim) const {
 	return spacing[dim];
 }
 
@@ -274,6 +274,4 @@ double Grid::get_opacity() const {
 void Grid::set_opacity(double opac) {
 	opacity = opac;
 }
-
-
 

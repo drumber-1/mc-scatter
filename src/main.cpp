@@ -10,7 +10,7 @@
 void dispose(); //Clean up
 void term(); //Exit safely, as failure
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
 
 	para::init_para(argc, argv);
 	random_gen::init();
@@ -24,17 +24,17 @@ int main(int argc, char *argv[]){
 	Console::ReturnCode return_code = Console::ReturnCode::Exit;
 	do {
 		return_code = Console::get_instance().read_line();
-	} while(return_code != Console::ReturnCode::Exit);
+	} while (return_code != Console::ReturnCode::Exit);
 	
 	dispose();
 	return 0;
 }
 
-void dispose(){
+void dispose() {
 	para::dispose_para();
 }
 
-void term(){
+void term() {
 	para::dispose_para();
 	exit(EXIT_FAILURE);
 }

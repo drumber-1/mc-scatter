@@ -18,7 +18,7 @@ Console::Console(std::string inital_prompt) : prompt(inital_prompt), command_map
 	
 	//Hardcoded commands:
 	//Help command - prints a list of the available commands
-	command_map["help"] = [this](const std::vector<std::string>& input){
+	command_map["help"] = [this](const std::vector<std::string>& input) {
 		std::vector<std::string> commands = get_commands();
 		logs::out << "Valid commands are:\n";
 		for (auto& cmd : commands) {
@@ -37,10 +37,10 @@ Console::Console(std::string inital_prompt) : prompt(inital_prompt), command_map
 	};
 }
 
-Console::~Console(){
+Console::~Console() {
 }
 
-Console& Console::get_instance(){
+Console& Console::get_instance() {
 	static Console instance("mc-scatter> ");
 	return instance;
 }
@@ -75,16 +75,16 @@ Console::ReturnCode Console::run_command(const std::string& command) {
 	}
 	
 	CommandMap::iterator it = command_map.find(inputs[0]);
-	if(it != end(command_map)){
+	if (it != end(command_map)) {
 		return (it->second)(inputs);
 	}
 	
 	return ReturnCode::Good;
 }
 
-Console::ReturnCode Console::run_script(const std::string& filename){
+Console::ReturnCode Console::run_script(const std::string& filename) {
 	std::ifstream file_input(filename);
-	if(!file_input.good()){
+	if (!file_input.good()) {
 		logs::err << "Could not open script: " << filename << "\n";
 		return ReturnCode::Error;
 	}
@@ -129,7 +129,7 @@ Console::ReturnCode Console::read_line() {
 	
 	para::broadcast(&input_bad);
 	
-	if(input_bad == 1) {
+	if (input_bad == 1) {
 		return ReturnCode::Exit;
 	}
 	

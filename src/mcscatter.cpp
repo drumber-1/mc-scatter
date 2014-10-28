@@ -11,11 +11,11 @@
 #include "problem.h"
 #include "log.h"
 
-MCScatter::MCScatter() : grid(problem::generate_grid()){
+MCScatter::MCScatter() : grid(problem::generate_grid()) {
 	data_location = "./data";
 }
 
-MCScatter& MCScatter::get_instance(){
+MCScatter& MCScatter::get_instance() {
 	static MCScatter inst;
 	return inst;
 }
@@ -42,7 +42,7 @@ std::string MCScatter::get_data_location() const {
 void MCScatter::set_data_location(const std::string& dl) {
 	data_location = dl;
 	struct stat st = {0};
-	if(stat(dl.c_str(), &st) == -1){
+	if (stat(dl.c_str(), &st) == -1) {
 		mkdir(dl.c_str(), 0700);
 	}
 }
@@ -68,16 +68,16 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 	//Create folder if it doesn't exist
 	std::string folder_name = data_location + "/scatter";
 	struct stat st = {0};
-	if(stat(folder_name.c_str(), &st) == -1){
+	if (stat(folder_name.c_str(), &st) == -1) {
 		mkdir(folder_name.c_str(), 0700);
 	}
 	
 	int print_step = n_photons/5;
 
-	for(int i = 1; i <= n_photons; i++){
+	for (int i = 1; i <= n_photons; i++) {
 		
 		//TODO Improve output info
-		if(i%print_step == 0){
+		if (i%print_step == 0) {
 			logs::out << logs::ProcessFlag::ALL;
 			logs::out << "Proc " << para::get_process_rank() << ": " << i << " of " << n_photons << " photons\n";
 			logs::out.reset_flags();
@@ -85,19 +85,19 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 		
 		Photon p = problem::generate_photon();
 		
-		while(true){
+		while (true) {
 			p.update(grid);
 			
-			if(p.absorbed || p.escaped){
+			if (p.absorbed || p.escaped) {
 				break;
 			}
 			
-			if(p.scattered){ //Peel of a photon
+			if (p.scattered) { //Peel of a photon
 				for (auto img : scatter_images) {
 					double theta = img.get_theta();
 					double phi = img.get_phi();
 					Photon p_peel = p.peel(theta, phi);
-					while(!p_peel.escaped){
+					while (!p_peel.escaped) {
 						p_peel.update(grid);
 					}
 					double weight = exp(-1*p_peel.get_tau_cur());
@@ -120,7 +120,7 @@ void MCScatter::do_colden_calculation() {
 	//Create folder if it doesn't exist
 	std::string folder_name = data_location + "/colden";
 	struct stat st = {0};
-	if(stat(folder_name.c_str(), &st) == -1){
+	if (stat(folder_name.c_str(), &st) == -1) {
 		mkdir(folder_name.c_str(), 0700);
 	}
 

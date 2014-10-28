@@ -5,13 +5,13 @@
 #include "para.h"
 #include "photon.h"
 
-void problem::init(){
+void problem::init() {
 }
 
-Grid problem::generate_grid(){
+Grid problem::generate_grid() {
 
 	GridParameters gp;
-	for(int i = 0; i < 3; i++){
+	for (int i = 0; i < 3; i++) {
 		gp.ncells[i] = 500;
 		gp.left_boundary[i] = -2;
 		gp.right_boundary[i] = 2;
@@ -19,9 +19,9 @@ Grid problem::generate_grid(){
 	
 	Grid grid(gp);
 	
-	for(int i = 0; i < gp.ncells[0]; i++){
-		for(int j = 0; j < gp.ncells[1]; j++){
-			for(int k = 0; k < gp.ncells[2]; k++){
+	for (int i = 0; i < gp.ncells[0]; i++) {
+		for (int j = 0; j < gp.ncells[1]; j++) {
+			for (int k = 0; k < gp.ncells[2]; k++) {
 				std::vector<int> cell(3);
 				cell[0] = i;
 				cell[1] = j;
@@ -42,7 +42,7 @@ Grid problem::generate_grid(){
 	
 }
 
-Photon problem::generate_photon(){
+Photon problem::generate_photon() {
 	Photon p (0, 0, 0);
 	return p;
 }
