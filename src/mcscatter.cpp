@@ -8,11 +8,12 @@
 #include "grid.h"
 #include "image.h"
 #include "para.h"
-#include "problem.h"
 #include "log.h"
 
-MCScatter::MCScatter() : grid(problem::generate_grid()) {
+MCScatter::MCScatter() {
 	data_location = "./data";
+	colden_location = "./data/colden";
+	scatter_location = "./data/scatter";
 }
 
 MCScatter& MCScatter::get_instance() {
@@ -66,10 +67,9 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 	logs::out << "Starting scattering simluation\n";
 
 	//Create folder if it doesn't exist
-	std::string folder_name = data_location + "/scatter";
 	struct stat st = {0};
-	if (stat(folder_name.c_str(), &st) == -1) {
-		mkdir(folder_name.c_str(), 0700);
+	if (stat(scatter_location.c_str(), &st) == -1) {
+		mkdir(scatter_location.c_str(), 0700);
 	}
 	
 	int print_step = n_photons/5;
@@ -83,7 +83,7 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 			logs::out.reset_flags();
 		}
 		
-		Photon p = problem::generate_photon();
+		Photon p (0, 0, 0);
 		
 		while (true) {
 			p.update(grid);
@@ -109,7 +109,7 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 	} //Photons
 	
 	for (auto img : scatter_images) {
-		img.output_global_image(get_data_location(), "scatter");
+		img.output_global_image(scatter_location, "scatter");
 	}
 	scatter_images.clear();
 }
@@ -118,10 +118,9 @@ void MCScatter::do_colden_calculation() {
 	logs::out << "Calculating column densities\n";
 	
 	//Create folder if it doesn't exist
-	std::string folder_name = data_location + "/colden";
 	struct stat st = {0};
-	if (stat(folder_name.c_str(), &st) == -1) {
-		mkdir(folder_name.c_str(), 0700);
+	if (stat(colden_location.c_str(), &st) == -1) {
+		mkdir(colden_location.c_str(), 0700);
 	}
 
 	//Column density calculations
@@ -129,7 +128,7 @@ void MCScatter::do_colden_calculation() {
 	for (auto img : colden_images) {
 		logs::out << "Column density image: " << i_img << " of " << colden_images.size() << "\n";
 		img.calculate_column_density(grid);
-		img.output_global_image(get_data_location(), "colden");
+		img.output_global_image(colden_location, "colden");
 		i_img++;
 	}
 	colden_images.clear();

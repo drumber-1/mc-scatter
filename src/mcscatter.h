@@ -11,6 +11,8 @@ class MCScatter {
 		std::list<Image> colden_images;
 		Grid grid;
 		std::string data_location;
+		std::string colden_location;
+		std::string scatter_location;
 		MCScatter();
 		MCScatter(MCScatter const& copy);
 		MCScatter& operator=(MCScatter const& copy);

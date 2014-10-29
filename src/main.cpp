@@ -2,7 +2,6 @@
 #include "mcscatter.h"
 #include "console.h"
 #include "random.h"
-#include "problem.h"
 #include "commands.h"
 #include "fileio.h"
 #include "log.h"
@@ -14,7 +13,6 @@ int main(int argc, char *argv[]) {
 
 	para::init_para(argc, argv);
 	random_gen::init();
-	problem::init();
 	commands::init();
 	FileIOInterface::init();
 

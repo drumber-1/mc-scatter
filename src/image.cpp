@@ -90,9 +90,9 @@ void Image::init(double theta, double phi, const GridParameters& gp) {
 std::string Image::construct_filename(std::string dir, std::string prefix, bool global) {
 	std::string filename;
 	if (global) {
-		filename = dir + "/" + prefix + "/" + prefix + "_" + util::int_to_string(id, 4) + ".dat";
+		filename = dir + "/" + prefix + "_" + util::int_to_string(id, 4) + ".dat";
 	} else {
-		filename = dir + "/" + prefix + "/" + prefix + "_" +  util::int_to_string(id, 4) + "_p" +  util::int_to_string(para::get_process_rank(), 4) + ".dat";
+		filename = dir + "/" + prefix + "_" +  util::int_to_string(id, 4) + "_p" +  util::int_to_string(para::get_process_rank(), 4) + ".dat";
 	}
 	
 	return filename;
