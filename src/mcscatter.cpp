@@ -9,16 +9,35 @@
 #include "image.h"
 #include "para.h"
 #include "log.h"
+#include "lua.h"
 
 MCScatter::MCScatter() {
 	data_location = "./data";
 	colden_location = "./data/colden";
 	scatter_location = "./data/scatter";
+	
+	read_config("./config.lua");
 }
 
 MCScatter& MCScatter::get_instance() {
 	static MCScatter inst;
 	return inst;
+}
+
+void MCScatter::read_config(std::string filename) {
+	if (!lua::open_file(filename)) {
+		logs::out << "Could not find " << filename << ", using default values\n";
+		return;
+	}
+	if (lua::is_string("data_location")) {
+		data_location = lua::get_string("data_location");
+	}
+	if (lua::is_string("colden_location")) {
+		data_location = lua::get_string("colden_location");
+	}
+	if (lua::is_string("scatter_location")) {
+		data_location = lua::get_string("scatter_location");
+	}
 }
 
 void MCScatter::add_image(double theta, double phi, const GridParameters& gp, std::string type) {
@@ -64,7 +83,12 @@ void MCScatter::print_misc_info() const {
 }
 
 void MCScatter::do_scatter_simulation(int n_photons) {
-	logs::out << "Starting scattering simluation\n";
+	logs::out << "Starting scattering simulation\n";
+	
+	if (!lua::is_function("generate_photon")) {
+		logs::err << "No photon generation function has been defined\n";
+		return;
+	}
 
 	//Create folder if it doesn't exist
 	struct stat st = {0};
@@ -83,7 +107,7 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 			logs::out.reset_flags();
 		}
 		
-		Photon p (0, 0, 0);
+		Photon p = lua::generate_photon();
 		
 		while (true) {
 			p.update(grid);

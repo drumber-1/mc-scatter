@@ -5,6 +5,7 @@
 #include "commands.h"
 #include "fileio.h"
 #include "log.h"
+#include "lua.h"
 
 void dispose(); //Clean up
 void term(); //Exit safely, as failure
@@ -15,6 +16,7 @@ int main(int argc, char *argv[]) {
 	random_gen::init();
 	commands::init();
 	FileIOInterface::init();
+	lua::init();
 
 	//Ensure the mcscatter object is created (and created now)
 	MCScatter::get_instance();

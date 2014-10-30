@@ -18,6 +18,7 @@ class MCScatter {
 		MCScatter& operator=(MCScatter const& copy);
 	public:
 		static MCScatter& get_instance();
+		void read_config(std::string filename);
 		void add_image(double theta, double phi, const GridParameters& gp, std::string type);
 		void add_image(double theta, double phi, std::string type);
 		std::string get_data_location() const;
