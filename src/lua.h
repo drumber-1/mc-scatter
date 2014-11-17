@@ -1,18 +1,22 @@
+#ifndef LUA
+#define LUA
+
 #include <string>
 #include <vector>
+#include <stdexcept>
 
-#include "photon.h"
+class LuaException : public std::runtime_error {
+	public:
+		LuaException(const std::string& message) : std::runtime_error(message) {};
+};
 
 namespace lua {
 	void init();
-	bool open_file(std::string filename);
-	Photon generate_photon();
-	Grid generate_grid();
-	bool is_function(std::string name);
-	bool is_number(std::string name);
-	double get_number(std::string name);
-	bool is_string(std::string name);
-	std::string get_string(std::string name);
-	bool is_table(std::string name);
-	std::vector<double> get_table(std::string name);
+	bool open_file(const std::string& filename);
+	std::vector<double> call_function(const std::string& name, const std::vector<double>& params, int n_out);
+	double get_number(const std::string& name);
+	std::string get_string(const std::string& name);
+	std::vector<double> get_table(const std::string& name);
 }
+
+#endif

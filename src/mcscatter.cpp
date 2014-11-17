@@ -25,7 +25,7 @@ MCScatter& MCScatter::get_instance() {
 }
 
 void MCScatter::read_config(std::string filename) {
-	if (!lua::open_file(filename)) {
+	/*if (!lua::open_file(filename)) {
 		logs::out << "Could not find " << filename << ", using default values\n";
 		return;
 	}
@@ -37,7 +37,7 @@ void MCScatter::read_config(std::string filename) {
 	}
 	if (lua::is_string("scatter_location")) {
 		data_location = lua::get_string("scatter_location");
-	}
+	}*/
 }
 
 void MCScatter::add_image(double theta, double phi, const GridParameters& gp, std::string type) {
@@ -84,11 +84,6 @@ void MCScatter::print_misc_info() const {
 
 void MCScatter::do_scatter_simulation(int n_photons) {
 	logs::out << "Starting scattering simulation\n";
-	
-	if (!lua::is_function("generate_photon")) {
-		logs::err << "No photon generation function has been defined\n";
-		return;
-	}
 
 	//Create folder if it doesn't exist
 	struct stat st = {0};
@@ -107,7 +102,8 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 			logs::out.reset_flags();
 		}
 		
-		Photon p = lua::generate_photon();
+		//Photon p = lua::generate_photon();
+		Photon p (0, 0, 0);
 		
 		while (true) {
 			p.update(grid);
