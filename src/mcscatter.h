@@ -5,6 +5,7 @@
 #include "grid.h"
 #include "image.h"
 #include "problem.h"
+#include "config.h"
 
 class MCScatter {
 		std::list<Image> scatter_images;
@@ -17,8 +18,8 @@ class MCScatter {
 		MCScatter(MCScatter const& copy);
 		MCScatter& operator=(MCScatter const& copy);
 	public:
+		Config config;
 		static MCScatter& get_instance();
-		void read_config(std::string filename);
 		void add_image(double theta, double phi, const GridParameters& gp, std::string type);
 		void add_image(double theta, double phi, std::string type);
 		std::string get_data_location() const;

@@ -11,33 +11,12 @@
 #include "log.h"
 #include "lua.h"
 
-MCScatter::MCScatter() {
-	data_location = "./data";
-	colden_location = "./data/colden";
-	scatter_location = "./data/scatter";
-	
-	read_config("./config.lua");
+MCScatter::MCScatter() : config("./config.lua") {
 }
 
 MCScatter& MCScatter::get_instance() {
 	static MCScatter inst;
 	return inst;
-}
-
-void MCScatter::read_config(std::string filename) {
-	/*if (!lua::open_file(filename)) {
-		logs::out << "Could not find " << filename << ", using default values\n";
-		return;
-	}
-	if (lua::is_string("data_location")) {
-		data_location = lua::get_string("data_location");
-	}
-	if (lua::is_string("colden_location")) {
-		data_location = lua::get_string("colden_location");
-	}
-	if (lua::is_string("scatter_location")) {
-		data_location = lua::get_string("scatter_location");
-	}*/
 }
 
 void MCScatter::add_image(double theta, double phi, const GridParameters& gp, std::string type) {
