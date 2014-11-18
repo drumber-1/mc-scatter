@@ -58,7 +58,7 @@ void MCScatter::print_image_info() {
 }
 
 void MCScatter::print_misc_info() const {
-	logs::out << "Data will be saved in " << data_location << "\n";
+	config.print();
 }
 
 void MCScatter::do_scatter_simulation(int n_photons) {

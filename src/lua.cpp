@@ -8,7 +8,6 @@ extern "C" {
 }
 
 #include "lua.h"
-#include "log.h"
 
 lua_State *ls;
 

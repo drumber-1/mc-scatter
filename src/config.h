@@ -9,6 +9,8 @@ class Config {
 		Config();
 		Config(const std::string& lua_file);
 		
+		void print() const;
+		
 		std::string data_location, colden_location, scatter_location;
 		int image_res[2];
 		int max_cells[3];
