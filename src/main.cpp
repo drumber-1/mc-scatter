@@ -2,10 +2,10 @@
 #include "mcscatter.h"
 #include "console.h"
 #include "random.h"
-#include "problem.h"
 #include "commands.h"
 #include "fileio.h"
 #include "log.h"
+#include "lua.h"
 
 void dispose(); //Clean up
 void term(); //Exit safely, as failure
@@ -14,12 +14,10 @@ int main(int argc, char *argv[]) {
 
 	para::init_para(argc, argv);
 	random_gen::init();
-	problem::init();
 	commands::init();
 	FileIOInterface::init();
-
-	//Ensure the mcscatter object is created (and created now)
-	MCScatter::get_instance();
+	lua::init();
+	MCScatter::init();
 	
 	Console::ReturnCode return_code = Console::ReturnCode::Exit;
 	do {

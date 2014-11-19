@@ -7,6 +7,7 @@
 #include <cmath>
 #include <sys/types.h>
 #include <sys/stat.h>
+
 #include "grid.h"
 #include "log.h"
 #include "util.h"
