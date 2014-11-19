@@ -17,9 +17,7 @@ int main(int argc, char *argv[]) {
 	commands::init();
 	FileIOInterface::init();
 	lua::init();
-
-	//Ensure the mcscatter object is created (and created now)
-	MCScatter::get_instance();
+	MCScatter::init();
 	
 	Console::ReturnCode return_code = Console::ReturnCode::Exit;
 	do {

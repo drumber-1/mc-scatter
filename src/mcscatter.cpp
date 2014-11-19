@@ -4,22 +4,27 @@
 #include <cmath>
 #include <sys/types.h>
 #include <sys/stat.h>
+
 #include "mcscatter.h"
 #include "grid.h"
 #include "image.h"
 #include "para.h"
 #include "log.h"
 #include "lua.h"
+#include "fileio.h"
 
-MCScatter::MCScatter() : config("./config.lua") {
+Config config;
+Grid grid;
+std::list<Image> scatter_images;
+std::list<Image> colden_images;
+
+void MCScatter::init() {
+	config = Config("./config.lua");
+	grid = Grid();
+	return;
 }
 
-MCScatter& MCScatter::get_instance() {
-	static MCScatter inst;
-	return inst;
-}
-
-void MCScatter::add_image(double theta, double phi, const GridParameters& gp, std::string type) {
+void MCScatter::add_image(double theta, double phi, const GridParameters& gp, const std::string& type) {
 	Image im (theta, phi, gp);
 	if (type == "colden") {
 		colden_images.push_back(im);
@@ -30,20 +35,8 @@ void MCScatter::add_image(double theta, double phi, const GridParameters& gp, st
 	}
 }
 
-void MCScatter::add_image(double theta, double phi, std::string type) {
+void MCScatter::add_image(double theta, double phi, const std::string& type) {
 	add_image(theta, phi, grid.get_parameters(), type);
-}
-
-std::string MCScatter::get_data_location() const {
-	return data_location;
-}
-
-void MCScatter::set_data_location(const std::string& dl) {
-	data_location = dl;
-	struct stat st = {0};
-	if (stat(dl.c_str(), &st) == -1) {
-		mkdir(dl.c_str(), 0700);
-	}
 }
 
 void MCScatter::print_image_info() {
@@ -57,8 +50,12 @@ void MCScatter::print_image_info() {
 	}
 }
 
-void MCScatter::print_misc_info() const {
+void MCScatter::print_config_info() {
 	config.print();
+}
+
+void MCScatter::print_grid_info() {
+	grid.print_info();
 }
 
 void MCScatter::do_scatter_simulation(int n_photons) {
@@ -66,8 +63,8 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 
 	//Create folder if it doesn't exist
 	struct stat st = {0};
-	if (stat(scatter_location.c_str(), &st) == -1) {
-		mkdir(scatter_location.c_str(), 0700);
+	if (stat(config.scatter_location.c_str(), &st) == -1) {
+		mkdir(config.scatter_location.c_str(), 0700);
 	}
 	
 	int print_step = n_photons/5;
@@ -108,7 +105,7 @@ void MCScatter::do_scatter_simulation(int n_photons) {
 	} //Photons
 	
 	for (auto img : scatter_images) {
-		img.output_global_image(scatter_location, "scatter");
+		img.output_global_image(config.scatter_location, "scatter");
 	}
 	scatter_images.clear();
 }
@@ -118,8 +115,8 @@ void MCScatter::do_colden_calculation() {
 	
 	//Create folder if it doesn't exist
 	struct stat st = {0};
-	if (stat(colden_location.c_str(), &st) == -1) {
-		mkdir(colden_location.c_str(), 0700);
+	if (stat(config.colden_location.c_str(), &st) == -1) {
+		mkdir(config.colden_location.c_str(), 0700);
 	}
 
 	//Column density calculations
@@ -127,10 +124,14 @@ void MCScatter::do_colden_calculation() {
 	for (auto img : colden_images) {
 		logs::out << "Column density image: " << i_img << " of " << colden_images.size() << "\n";
 		img.calculate_column_density(grid);
-		img.output_global_image(colden_location, "colden");
+		img.output_global_image(config.colden_location, "colden");
 		i_img++;
 	}
 	colden_images.clear();
+}
+
+void MCScatter::do_slices() {
+	grid.output_slices(config.data_location, 0);
 }
 
 void MCScatter::clear_grid() {
@@ -142,19 +143,39 @@ void MCScatter::clear_images() {
 	scatter_images.clear();
 }
 
-void MCScatter::set_grid(const Grid& new_grid) {
-	grid.clear();
-	grid = new_grid;
+bool MCScatter::read_grid(const std::string& filetype, const std::string& filename) {
+
+	if (!FileIOInterface::file_type_supported(filetype)) {
+		logs::err << filetype << " is an unrecognised filetype\n";
+		return false;
+	}
+
+	clear_grid();
+	
+	//These grid parameters determine the maximum number of cells to use
+	GridParameters gp;
+	for (int i = 0; i < 3; i++) {
+		gp.ncells[i] = config.max_cells[i];
+		gp.left_boundary[i] = config.left_bound[i];
+		gp.right_boundary[i] = config.right_bound[i];
+	}
+	
+	std::string full_path = config.data_location + std::string("/") + filename;
+	
+	grid = FileIOInterface::read_file(filetype, full_path, gp);
+	return true;
 }
 
-const Grid& MCScatter::get_grid() const {
-	return grid;
+bool MCScatter::write_grid(const std::string& filetype, const std::string& filename) {
+
+	if (!FileIOInterface::file_type_supported(filetype)) {
+		logs::err << filetype << " is an unrecognised filetype\n";
+		return false;
+	}
+	
+	std::string full_path = config.data_location + std::string("/") + filename;
+	
+	FileIOInterface::write_file(filetype, full_path, grid);
+	return true;
 }
 
-const std::list<Image>& MCScatter::get_scatter_images() const {
-	return scatter_images;
-}
-
-const std::list<Image>& MCScatter::get_colden_images() const {
-	return colden_images;
-}
