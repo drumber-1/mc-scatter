@@ -121,14 +121,9 @@ void MCScatter::print_grid_info() {
 
 void MCScatter::add_image(double theta, double phi, const std::string& type) {
 
-	GridParameters gp;
-	for (int i = 0; i < 3; i++) {
-		gp.ncells[i] = config.max_cells[i];
-		gp.left_boundary[i] = config.left_bound[i];
-		gp.right_boundary[i] = config.right_bound[i];
-	}
+	//TODO check image size for 0s and match grid in that case
 
-	Image im (theta, phi, gp);
+	Image im (theta, phi, config.image_size);
 	if (type == "colden") {
 		colden_images.push_back(im);
 	} else if (type == "scatter") {
@@ -157,17 +152,9 @@ bool MCScatter::read_grid(const std::string& filetype, const std::string& filena
 
 	clear_grid();
 	
-	//These grid parameters determine the maximum number of cells to use
-	GridParameters gp;
-	for (int i = 0; i < 3; i++) {
-		gp.ncells[i] = config.max_cells[i];
-		gp.left_boundary[i] = config.left_bound[i];
-		gp.right_boundary[i] = config.right_bound[i];
-	}
-	
 	std::string full_path = config.data_location + std::string("/") + filename;
 	
-	grid = FileIOInterface::read_file(filetype, full_path, gp);
+	grid = FileIOInterface::read_file(filetype, full_path, config.grid_limits);
 	return true;
 }
 
