@@ -119,7 +119,15 @@ void MCScatter::print_grid_info() {
 	grid.print_info();
 }
 
-void MCScatter::add_image(double theta, double phi, const GridParameters& gp, const std::string& type) {
+void MCScatter::add_image(double theta, double phi, const std::string& type) {
+
+	GridParameters gp;
+	for (int i = 0; i < 3; i++) {
+		gp.ncells[i] = config.max_cells[i];
+		gp.left_boundary[i] = config.left_bound[i];
+		gp.right_boundary[i] = config.right_bound[i];
+	}
+
 	Image im (theta, phi, gp);
 	if (type == "colden") {
 		colden_images.push_back(im);
@@ -128,10 +136,6 @@ void MCScatter::add_image(double theta, double phi, const GridParameters& gp, co
 	} else {
 		logs::err << "Invalid image type: " << type << "\n";
 	}
-}
-
-void MCScatter::add_image(double theta, double phi, const std::string& type) {
-	add_image(theta, phi, grid.get_parameters(), type);
 }
 
 void MCScatter::clear_images() {

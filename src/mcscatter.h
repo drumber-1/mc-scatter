@@ -17,7 +17,6 @@ namespace MCScatter {
 		void print_image_info();
 		void print_config_info();
 		void print_grid_info();
-		void add_image(double theta, double phi, const GridParameters& gp, const std::string& type);
 		void add_image(double theta, double phi, const std::string& type);
 		void clear_images();
 		bool read_grid(const std::string& filetype, const std::string& filename);
