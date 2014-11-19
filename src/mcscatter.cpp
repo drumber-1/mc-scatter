@@ -24,40 +24,6 @@ void MCScatter::init() {
 	return;
 }
 
-void MCScatter::add_image(double theta, double phi, const GridParameters& gp, const std::string& type) {
-	Image im (theta, phi, gp);
-	if (type == "colden") {
-		colden_images.push_back(im);
-	} else if (type == "scatter") {
-		scatter_images.push_back(im);
-	} else {
-		logs::err << "Invalid image type: " << type << "\n";
-	}
-}
-
-void MCScatter::add_image(double theta, double phi, const std::string& type) {
-	add_image(theta, phi, grid.get_parameters(), type);
-}
-
-void MCScatter::print_image_info() {
-	logs::out << "There are " << scatter_images.size() << " scatter images\n";
-	for (auto img : scatter_images) {
-		img.print_info();
-	}
-	logs::out << "There are " << colden_images.size() << " column density images\n";
-	for (auto img : colden_images) {
-		img.print_info();
-	}
-}
-
-void MCScatter::print_config_info() {
-	config.print();
-}
-
-void MCScatter::print_grid_info() {
-	grid.print_info();
-}
-
 void MCScatter::do_scatter_simulation(int n_photons) {
 	logs::out << "Starting scattering simulation\n";
 
@@ -134,13 +100,48 @@ void MCScatter::do_slices() {
 	grid.output_slices(config.data_location, 0);
 }
 
-void MCScatter::clear_grid() {
-	grid.clear();
+void MCScatter::print_image_info() {
+	logs::out << "There are " << scatter_images.size() << " scatter images\n";
+	for (auto img : scatter_images) {
+		img.print_info();
+	}
+	logs::out << "There are " << colden_images.size() << " column density images\n";
+	for (auto img : colden_images) {
+		img.print_info();
+	}
+}
+
+void MCScatter::print_config_info() {
+	config.print();
+}
+
+void MCScatter::print_grid_info() {
+	grid.print_info();
+}
+
+void MCScatter::add_image(double theta, double phi, const GridParameters& gp, const std::string& type) {
+	Image im (theta, phi, gp);
+	if (type == "colden") {
+		colden_images.push_back(im);
+	} else if (type == "scatter") {
+		scatter_images.push_back(im);
+	} else {
+		logs::err << "Invalid image type: " << type << "\n";
+	}
+}
+
+void MCScatter::add_image(double theta, double phi, const std::string& type) {
+	add_image(theta, phi, grid.get_parameters(), type);
 }
 
 void MCScatter::clear_images() {
 	colden_images.clear();
 	scatter_images.clear();
+}
+
+
+void MCScatter::clear_grid() {
+	grid.clear();
 }
 
 bool MCScatter::read_grid(const std::string& filetype, const std::string& filename) {
