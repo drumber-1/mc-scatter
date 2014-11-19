@@ -20,7 +20,6 @@ std::list<Image> colden_images;
 
 void MCScatter::init() {
 	config = Config("./config.lua");
-	grid = Grid();
 	return;
 }
 
