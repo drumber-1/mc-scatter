@@ -1,20 +1,29 @@
-#pragma once
+#ifndef IMAGE
+#define IMAGE
 
 #include <string>
 #include <list>
 #include "grid.h"
 
+class ImageParameters {
+	public:
+		int npixels[2];
+		double left_boundary[2];
+		double right_boundary[2];
+};
+
 class Image {
 		double obs_theta, obs_phi; //Observer Direction
-		int image_npixels[2], id;
-		double image_left[2], image_right[2], image_pixel_spacing[2];
+		int id;
+		ImageParameters parameters;
+		double image_pixel_spacing[2];
 		double **image;
-		void init(double theta, double phi, const GridParameters& gp);
+		void init(double theta, double phi, const ImageParameters& gp);
 		std::string construct_filename(std::string dir, std::string prefix, bool global);
 		static int nimages; //Number of images defined, used to give each image a unique id
 	public:
-		Image (double theta, double phi, const GridParameters& gp);
-		~Image ();
+		Image(double theta, double phi, const ImageParameters& gp);
+		~Image();
 		Image(const Image& other);
 		void add(double x, double y, double z, double weight);
 		void calculate_column_density(const Grid& grid);
@@ -28,3 +37,5 @@ class Image {
 		int get_npixels(int dim);
 		void print_info();
 };
+
+#endif

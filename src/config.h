@@ -3,6 +3,9 @@
 
 #include <string>
 
+#include "grid.h"
+#include "image.h"
+
 class Config {
 		void set_defaults();
 	public:
@@ -12,9 +15,8 @@ class Config {
 		void print() const;
 		
 		std::string data_location, colden_location, scatter_location;
-		int image_res[2];
-		int max_cells[3];
-		double left_bound[3], right_bound[3];
+		GridParameters grid_limits;
+		ImageParameters image_size;
 };
 
 #endif
