@@ -9,22 +9,16 @@ extern "C" {
 
 #include "lua.h"
 
-lua_State *ls;
-
-void lua::init() {
-	ls = luaL_newstate();
+lua_State* lua::open_file(const std::string& filename) {
+	lua_State* ls = luaL_newstate();
 	luaL_openlibs(ls);
-}
-
-bool lua::open_file(const std::string& filename) {
 	if (luaL_loadfile(ls, filename.c_str()) || lua_pcall(ls, 0, 0, 0)) {
-		return false;
-	} else {
-		return true;
+		throw LuaException(filename + " is not a valid lua file");
 	}
+	return ls;
 }
 
-std::vector<double> lua::call_function(const std::string& name, const std::vector<double>& params, int n_out) {
+std::vector<double> lua::call_function(lua_State* ls, const std::string& name, const std::vector<double>& params, int n_out) {
 	lua_getglobal(ls, name.c_str());
 	if (!lua_isfunction(ls, -1)) {
 		throw LuaException(name + " does not reference a valid number");
@@ -33,7 +27,7 @@ std::vector<double> lua::call_function(const std::string& name, const std::vecto
 	return x;
 }
 
-double lua::get_number(const std::string& name) {
+double lua::get_number(lua_State* ls, const std::string& name) {
 	lua_getglobal(ls, name.c_str());
 	if (!lua_isnumber(ls, -1)) {
 		throw LuaException(name + " does not reference a valid number");
@@ -43,7 +37,7 @@ double lua::get_number(const std::string& name) {
 	return x;
 }
 
-std::string lua::get_string(const std::string& name) {
+std::string lua::get_string(lua_State* ls, const std::string& name) {
 	lua_getglobal(ls, name.c_str());
 	if (!lua_isstring(ls, -1)) {
 		throw LuaException(name + " does not reference a valid string");
@@ -53,7 +47,7 @@ std::string lua::get_string(const std::string& name) {
 	return str;
 }
 
-std::vector<double> lua::get_table(const std::string& name) {
+std::vector<double> lua::get_table(lua_State* ls, const std::string& name) {
 	lua_getglobal(ls, name.c_str());
 	if (!lua_istable(ls, -1)) {
 		throw LuaException(name + " does not reference a valid table");

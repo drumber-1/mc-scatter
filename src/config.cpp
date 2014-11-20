@@ -11,22 +11,25 @@ Config::Config() {
 
 Config::Config(const std::string& lua_file) {
 	set_defaults();
-	if(!lua::open_file(lua_file)) {
-		logs::err << "Could not file lua file: " << lua_file << ", using default values\n";
+	lua_State* ls;
+	try {
+		ls = lua::open_file(lua_file);
+	} catch (LuaException& e) {
+		logs::err << e.what() << ", using default values\n";
 		return;
 	}
 
-	data_location = lua::get_string("data_location");
-	colden_location = lua::get_string("colden_location");
-	scatter_location = lua::get_string("scatter_location");
+	data_location = lua::get_string(ls, "data_location");
+	colden_location = lua::get_string(ls, "colden_location");
+	scatter_location = lua::get_string(ls, "scatter_location");
 	
-	std::vector<double> cells_vec = lua::get_table("grid_cells");
-	std::vector<double> grid_left_vec = lua::get_table("grid_left");
-	std::vector<double> grid_right_vec = lua::get_table("grid_right");
+	std::vector<double> cells_vec = lua::get_table(ls, "grid_cells");
+	std::vector<double> grid_left_vec = lua::get_table(ls, "grid_left");
+	std::vector<double> grid_right_vec = lua::get_table(ls, "grid_right");
 	
-	std::vector<double> pixels_vec = lua::get_table("image_pixels");
-	std::vector<double> image_left_vec = lua::get_table("image_left");
-	std::vector<double> image_right_vec = lua::get_table("image_right");
+	std::vector<double> pixels_vec = lua::get_table(ls, "image_pixels");
+	std::vector<double> image_left_vec = lua::get_table(ls, "image_left");
+	std::vector<double> image_right_vec = lua::get_table(ls, "image_right");
 	
 	for (int i = 0; i < 3; i++) {
 		grid_limits.ncells[i] = cells_vec[i];
