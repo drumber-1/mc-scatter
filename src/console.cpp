@@ -10,6 +10,7 @@
 #include "console.h"
 #include "para.h"
 #include "log.h"
+#include "lua.h"
 
 Console::Console(std::string inital_prompt) : prompt(inital_prompt), command_map({ {"quit",{}}, {"exit",{}} }) {
 	
@@ -34,6 +35,15 @@ Console::Console(std::string inital_prompt) : prompt(inital_prompt), command_map
 			return ReturnCode::Error;
 		}
 		return run_script(input[1]);
+	};
+	
+	//Run lua command - executes all commands in the "command" table
+	command_map["runlua"] = [this](const std::vector<std::string>& input) {
+		if (input.size() < 2) {
+			logs::err << "Usage: " << input[0] << " <script name>\n";
+			return ReturnCode::Error;
+		}
+		return run_lua_script(input[1]);
 	};
 }
 
@@ -100,6 +110,27 @@ Console::ReturnCode Console::run_script(const std::string& filename) {
 		}
 		logs::out << "[" << counter << "] " << command << '\n';
 		result = run_command(command);
+		if (result != ReturnCode::Good) {
+			return result;
+		}
+		counter++;
+	}
+	
+	return ReturnCode::Good; 
+}
+
+Console::ReturnCode Console::run_lua_script(const std::string& filename) {
+
+	lua_State* ls;
+	ls = lua::open_file(filename);
+	
+	std::vector<std::string> commands = lua::get_string_table(ls, "commands");
+	
+	int counter = 0;
+	ReturnCode result;
+	for (auto c : commands) {
+		logs::out << "[" << counter << "] " << c << '\n';
+		result = run_command(c);
 		if (result != ReturnCode::Good) {
 			return result;
 		}
