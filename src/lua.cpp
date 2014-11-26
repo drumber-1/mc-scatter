@@ -47,7 +47,7 @@ std::string lua::get_string(lua_State* ls, const std::string& name) {
 	return str;
 }
 
-std::vector<double> lua::get_table(lua_State* ls, const std::string& name) {
+std::vector<double> lua::get_number_table(lua_State* ls, const std::string& name) {
 	lua_getglobal(ls, name.c_str());
 	if (!lua_istable(ls, -1)) {
 		throw LuaException(name + " does not reference a valid table");
@@ -57,6 +57,22 @@ std::vector<double> lua::get_table(lua_State* ls, const std::string& name) {
 	while (lua_next(ls, -2)) {
 		if (lua_isnumber(ls, -1)) {
 			out.push_back(lua_tonumber(ls, -1));
+		}
+		lua_pop(ls, 1);
+	}
+	return out;
+}
+
+std::vector<std::string> lua::get_string_table(lua_State* ls, const std::string& name) {
+	lua_getglobal(ls, name.c_str());
+	if (!lua_istable(ls, -1)) {
+		throw LuaException(name + " does not reference a valid table");
+	}
+	lua_pushnil(ls);
+	std::vector<std::string> out;
+	while (lua_next(ls, -2)) {
+		if (lua_isstring(ls, -1)) {
+			out.push_back(lua_tostring(ls, -1));
 		}
 		lua_pop(ls, 1);
 	}

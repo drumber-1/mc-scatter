@@ -65,13 +65,13 @@ void Config::set_lua(const std::string& lua_file) {
 	colden_location = lua::get_string(ls, "colden_location");
 	scatter_location = lua::get_string(ls, "scatter_location");
 	
-	std::vector<double> cells_vec = lua::get_table(ls, "grid_cells");
-	std::vector<double> grid_left_vec = lua::get_table(ls, "grid_left");
-	std::vector<double> grid_right_vec = lua::get_table(ls, "grid_right");
+	std::vector<double> cells_vec = lua::get_number_table(ls, "grid_cells");
+	std::vector<double> grid_left_vec = lua::get_number_table(ls, "grid_left");
+	std::vector<double> grid_right_vec = lua::get_number_table(ls, "grid_right");
 	
-	std::vector<double> pixels_vec = lua::get_table(ls, "image_pixels");
-	std::vector<double> image_left_vec = lua::get_table(ls, "image_left");
-	std::vector<double> image_right_vec = lua::get_table(ls, "image_right");
+	std::vector<double> pixels_vec = lua::get_number_table(ls, "image_pixels");
+	std::vector<double> image_left_vec = lua::get_number_table(ls, "image_left");
+	std::vector<double> image_right_vec = lua::get_number_table(ls, "image_right");
 	
 	for (int i = 0; i < 3; i++) {
 		grid_limits.ncells[i] = cells_vec[i];

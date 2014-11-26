@@ -21,7 +21,8 @@ namespace lua {
 	std::vector<double> call_function(lua_State* ls, const std::string& name, const std::vector<double>& params, int n_out);
 	double get_number(lua_State* ls, const std::string& name);
 	std::string get_string(lua_State* ls, const std::string& name);
-	std::vector<double> get_table(lua_State* ls, const std::string& name);
+	std::vector<double> get_number_table(lua_State* ls, const std::string& name);
+	std::vector<std::string> get_string_table(lua_State* ls, const std::string& name);
 }
 
 #endif
