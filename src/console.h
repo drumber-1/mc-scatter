@@ -19,6 +19,7 @@ class Console {
 		void register_command(const std::string& cmd, CommandFunction function);
 		ReturnCode run_command(const std::string& command);
 		ReturnCode run_script(const std::string& filename);
+		ReturnCode run_lua_script(const std::string& filename);
 		ReturnCode read_line();
 	private:
 		Console(std::string prompt);

@@ -121,8 +121,18 @@ void MCScatter::print_grid_info() {
 void MCScatter::add_image(double theta, double phi, const std::string& type) {
 
 	//TODO check image size for 0s and match grid in that case
+	ImageParameters ip = config.image_size;
+	for (int i = 0; i < 2; i++) {
+		if (config.image_size.npixels[i] == 0) {
+			ip.npixels[i] = grid.get_parameters().ncells[i];
+		}
+		if (config.image_size.left_boundary[i] == config.image_size.right_boundary[i]) {
+			ip.left_boundary[i] = grid.get_parameters().left_boundary[i];
+			ip.right_boundary[i] = grid.get_parameters().right_boundary[i];
+		}
+	}
 
-	Image im (theta, phi, config.image_size);
+	Image im (theta, phi, ip);
 	if (type == "colden") {
 		colden_images.push_back(im);
 	} else if (type == "scatter") {
@@ -167,6 +177,16 @@ bool MCScatter::write_grid(const std::string& filetype, const std::string& filen
 	std::string full_path = config.data_location + std::string("/") + filename;
 	
 	FileIOInterface::write_file(filetype, full_path, grid);
+	return true;
+}
+
+bool MCScatter::read_config(const std::string& filename) {
+	try {
+		config.set_lua(filename);
+	} catch (LuaException& e) {
+		logs::err << e.what() << "\n";
+		return false;
+	}
 	return true;
 }
 
