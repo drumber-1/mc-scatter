@@ -180,3 +180,13 @@ bool MCScatter::write_grid(const std::string& filetype, const std::string& filen
 	return true;
 }
 
+bool MCScatter::read_config(const std::string& filename) {
+	try {
+		config.set_lua(filename);
+	} catch (LuaException& e) {
+		logs::err << e.what() << "\n";
+		return false;
+	}
+	return true;
+}
+
