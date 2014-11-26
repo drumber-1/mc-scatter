@@ -22,6 +22,7 @@ namespace MCScatter {
 		bool read_grid(const std::string& filetype, const std::string& filename);
 		bool write_grid(const std::string& filetype, const std::string& filename);
 		void clear_grid();
+		bool read_config(const std::string& filename);
 }
 
 #endif

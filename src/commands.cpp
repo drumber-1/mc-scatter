@@ -17,6 +17,7 @@ Console::ReturnCode set_data_location(std::vector<std::string> input);
 Console::ReturnCode add_image(std::vector<std::string> input);
 Console::ReturnCode read(std::vector<std::string> input);
 Console::ReturnCode write(std::vector<std::string> input);
+Console::ReturnCode config(std::vector<std::string> input);
 
 void commands::init() {
 	Console::get_instance().register_command("info", print_info);
@@ -27,12 +28,13 @@ void commands::init() {
 	Console::get_instance().register_command("addimage", add_image);
 	Console::get_instance().register_command("read", read);
 	Console::get_instance().register_command("write", write);
+	Console::get_instance().register_command("config", config);
 }
 
 Console::ReturnCode print_info(std::vector<std::string> input) {
 	
 	if (input.size() != 2) {
-		logs::err << "Usage: " << input[0] << " grid|images|misc\n";
+		logs::err << "Usage: " << input[0] << " grid|images|config\n";
 		return Console::ReturnCode::Error;
 	}
 
@@ -122,6 +124,19 @@ Console::ReturnCode write(std::vector<std::string> input) {
 	}
 	
 	if (!MCScatter::write_grid(input[1], input[2])) {
+		return Console::ReturnCode::Error;
+	}
+	
+	return Console::ReturnCode::Good;
+}
+
+Console::ReturnCode config(std::vector<std::string> input) {
+	if (input.size() != 2) {
+		logs::err << "Usage: " << input[0] << " configfile\n";
+		return Console::ReturnCode::Error;
+	}
+	
+	if (!MCScatter::read_config(input[1])) {
 		return Console::ReturnCode::Error;
 	}
 	

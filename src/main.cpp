@@ -16,7 +16,6 @@ int main(int argc, char *argv[]) {
 	random_gen::init();
 	commands::init();
 	FileIOInterface::init();
-	lua::init();
 	MCScatter::init();
 	
 	Console::ReturnCode return_code = Console::ReturnCode::Exit;
