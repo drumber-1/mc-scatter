@@ -11,7 +11,7 @@
 #include "util.h"
 #include "para.h"
 
-//This is a custom file format make of collection of files
+//This is a custom file format made of collection of files
 //It consists of:
 //	metadata.txt text file containing with key value pairs separated by colons
 //	rd_lev_XX.rho binary files, containing data values in X, Y, Z, rho order in double precision
