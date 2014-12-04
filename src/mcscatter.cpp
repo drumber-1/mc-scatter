@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 
 #include "mcscatter.h"
+#include "photon.h"
 #include "grid.h"
 #include "image.h"
 #include "para.h"
@@ -152,7 +153,7 @@ void MCScatter::clear_grid() {
 	grid.clear();
 }
 
-bool MCScatter::read_grid(const std::string& filetype, const std::string& filename) {
+bool MCScatter::read_grid(const std::string& filetype, const std::string& filename, bool in_data_location) {
 
 	if (!FileIOInterface::file_type_supported(filetype)) {
 		logs::err << filetype << " is an unrecognised filetype\n";
@@ -161,20 +162,30 @@ bool MCScatter::read_grid(const std::string& filetype, const std::string& filena
 
 	clear_grid();
 	
-	std::string full_path = config.data_location + std::string("/") + filename;
+	std::string full_path;
+	if (in_data_location) {
+		full_path = config.data_location + std::string("/") + filename;
+	} else {
+		full_path = filename;
+	}
 	
 	grid = FileIOInterface::read_file(filetype, full_path, config.grid_limits);
 	return true;
 }
 
-bool MCScatter::write_grid(const std::string& filetype, const std::string& filename) {
+bool MCScatter::write_grid(const std::string& filetype, const std::string& filename, bool in_data_location) {
 
 	if (!FileIOInterface::file_type_supported(filetype)) {
 		logs::err << filetype << " is an unrecognised filetype\n";
 		return false;
 	}
 	
-	std::string full_path = config.data_location + std::string("/") + filename;
+	std::string full_path;
+	if(in_data_location) {
+		full_path = config.data_location + std::string("/") + filename;
+	} else {
+		full_path = filename;
+	}
 	
 	FileIOInterface::write_file(filetype, full_path, grid);
 	return true;

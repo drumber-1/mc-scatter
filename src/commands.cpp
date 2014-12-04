@@ -8,6 +8,8 @@
 #include "log.h"
 #include "util.h"
 
+//TODO create command class and clean/condense this up
+
 Console::ReturnCode print_info(std::vector<std::string> input);
 Console::ReturnCode do_slices(std::vector<std::string> input);
 Console::ReturnCode do_scatter(std::vector<std::string> input);
@@ -104,27 +106,52 @@ Console::ReturnCode add_image(std::vector<std::string> input) {
 	return Console::ReturnCode::Good;
 }
 
+//This function is a little messy currently
+//When command class is created it should handle things like this more
+//elegantly
 Console::ReturnCode read(std::vector<std::string> input) {
-	if (input.size() != 3) {
-		logs::err << "Usage: " << input[0] << " filetype filename\n";
+	if (input.size() != 3 && input.size() != 4) {
+		logs::err << "Usage: " << input[0] << " filetype [-d] filename\n";
 		return Console::ReturnCode::Error;
 	}
 	
-	if (!MCScatter::read_grid(input[1], input[2])) {
-		return Console::ReturnCode::Error;
+	if (input.size() == 4) {
+		if (input[2] == "-d") {
+			if (!MCScatter::read_grid(input[1], input[3], true)) {
+				return Console::ReturnCode::Error;
+			}
+		} else {
+			logs::err << "Usage: " << input[0] << " filetype [-d] filename\n";
+			return Console::ReturnCode::Error;
+		}
+	} else {
+		if (!MCScatter::read_grid(input[1], input[2], false)) {
+			return Console::ReturnCode::Error;
+		}
 	}
 	
 	return Console::ReturnCode::Good;
 }
 
-Console::ReturnCode write(std::vector<std::string> input) {
-	if (input.size() != 3) {
-		logs::err << "Usage: " << input[0] << " filetype filename\n";
+Console::ReturnCode write(std::vector<std::string> input) {	
+	if (input.size() != 3 && input.size() != 4) {
+		logs::err << "Usage: " << input[0] << " filetype [-d] filename\n";
 		return Console::ReturnCode::Error;
 	}
 	
-	if (!MCScatter::write_grid(input[1], input[2])) {
-		return Console::ReturnCode::Error;
+	if (input.size() == 4) {
+		if (input[2] == "-d") {
+			if (!MCScatter::write_grid(input[1], input[3], true)) {
+				return Console::ReturnCode::Error;
+			}
+		} else {
+			logs::err << "Usage: " << input[0] << " filetype [-d] filename\n";
+			return Console::ReturnCode::Error;
+		}
+	} else {
+		if (!MCScatter::write_grid(input[1], input[2], false)) {
+			return Console::ReturnCode::Error;
+		}
 	}
 	
 	return Console::ReturnCode::Good;
