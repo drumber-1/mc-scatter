@@ -88,8 +88,8 @@ Grid FileIOMG::read_file(std::string filename, const GridParameters& grid_parame
 		
 		int data_points = 0;
 
-		std::vector<int> cell(3);
-		std::vector<int> cell_fine(3);
+		Point cell;
+		Point cell_fine;
 		
 		//Note: Coordinates from file are cell centres
 		while (!level_file.eof()) {
@@ -187,8 +187,8 @@ void FileIOMG::write_file(std::string filename, const Grid& grid) {
 	for (int i = 0; i < grid.get_parameters().ncells[0]; i++) {
 		for (int j = 0; j < grid.get_parameters().ncells[1]; j++) {
 			for (int k = 0; k < grid.get_parameters().ncells[2]; k++) {
-				std::vector<int> cell {i, j, k};
-				std::vector<double> pos = grid.get_position(cell);
+				Point cell = {{i, j, k}};
+				Position pos = grid.get_position(cell);
 				double rho = grid.get_rho(cell);
 				
 				for (int id = 0; id < 3; id++) {

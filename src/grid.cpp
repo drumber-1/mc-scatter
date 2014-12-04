@@ -187,7 +187,7 @@ void Grid::print_info() const {
 	}
 }
 
-bool Grid::is_on_grid(const std::vector<double>& pos) const {
+bool Grid::is_on_grid(const Position& pos) const {
 	if (pos[0] <= parameters.left_boundary[0] ||
 	    pos[1] <= parameters.left_boundary[1] ||
 	    pos[2] <= parameters.left_boundary[2] ||
@@ -200,7 +200,7 @@ bool Grid::is_on_grid(const std::vector<double>& pos) const {
 	}
 }
 
-bool Grid::is_on_grid(const std::vector<int>& cell) const {
+bool Grid::is_on_grid(const Point& cell) const {
 	if (cell[0] < 0 ||
 	    cell[1] < 0 ||
 	    cell[2] < 0 ||
@@ -213,28 +213,26 @@ bool Grid::is_on_grid(const std::vector<int>& cell) const {
 	}
 }
 
-std::vector<double> Grid::get_position(const std::vector<int>& cell) const {
-	std::vector<double> pos(3);
-	for (int i = 0; i < 3; i++) {
-		pos[i] = cell[i] * spacing[i] + parameters.left_boundary[i];
-	}
+Position Grid::get_position(const Point& cell) const {
+	Position pos = {{cell[0] * spacing[0] + parameters.left_boundary[0],
+	                 cell[1] * spacing[1] + parameters.left_boundary[1],
+	                 cell[2] * spacing[2] + parameters.left_boundary[2]}};
 	return pos;
 }
 
-std::vector<int> Grid::get_cell(const std::vector<double>& pos) const {
-	std::vector<int> cell(3);
-	for (int i = 0; i < 3; i++) {
-		cell[i] = floor((pos[i] - parameters.left_boundary[i]) / spacing[i]);
-	}
+Point Grid::get_cell(const Position& pos) const {
+	Point cell = {{(int)floor((pos[0] - parameters.left_boundary[0]) / spacing[0]),
+	               (int)floor((pos[1] - parameters.left_boundary[1]) / spacing[1]),
+	               (int)floor((pos[2] - parameters.left_boundary[2]) / spacing[2])}};
 	return cell;
 }
 
-double Grid::get_rho(const std::vector<double>& pos) const {
-	std::vector<int> cell = get_cell(pos);
+double Grid::get_rho(const Position& pos) const {
+	Point cell = get_cell(pos);
 	return get_rho(cell);
 }
 
-double Grid::get_rho(const std::vector<int>& cell) const {
+double Grid::get_rho(const Point& cell) const {
 	if (is_on_grid(cell)) {
 		return rho_data[cell[0]][cell[1]][cell[2]];
 	} else {
@@ -242,7 +240,7 @@ double Grid::get_rho(const std::vector<int>& cell) const {
 	}
 }
 
-void Grid::set_rho(const std::vector<int>& cell, double rho) {
+void Grid::set_rho(const Point& cell, double rho) {
 	if (is_on_grid(cell)) {
 		rho_data[cell[0]][cell[1]][cell[2]] = rho;
 	}

@@ -1,5 +1,5 @@
 #include <string>
-#include <vector>
+#include <initializer_list>
 
 extern "C" {
 	#include <lua.h>
@@ -18,12 +18,7 @@ lua_State* lua::open_file(const std::string& filename) {
 	return ls;
 }
 
-double lua::call_function(lua_State* ls, const std::string& name, const std::vector<double>& params) {
-	std::vector<double> out = call_function(ls, name, params, 1);
-	return out[0];
-}
-
-std::vector<double> lua::call_function(lua_State* ls, const std::string& name, const std::vector<double>& params, int n_out) {
+double lua::call_function(lua_State* ls, const std::string& name, const std::initializer_list<double>& params) {
 	lua_getglobal(ls, name.c_str());
 	if (!lua_isfunction(ls, -1)) {
 		throw LuaException(name + " does not reference a valid function");
@@ -31,10 +26,12 @@ std::vector<double> lua::call_function(lua_State* ls, const std::string& name, c
 	for (auto x : params) {
 		lua_pushnumber(ls, x);
 	}
-	if (lua_pcall(ls, params.size(), n_out, 0) != 0) {
+	if (lua_pcall(ls, params.size(), 1, 0) != 0) {
 		throw LuaException("Error calling function " + name + ": " + lua_tostring(ls, -1));
 	}
-	std::vector<double> out;
+	
+	//Returning multiple doubles is deprecated until it is actually needed
+	/*std::vector<double> out;
 	for (int i = 1; i <= n_out; i++) {
 		if (lua_isnumber(ls, -i)) {
 			out.push_back(lua_tonumber(ls, -i));
@@ -42,8 +39,12 @@ std::vector<double> lua::call_function(lua_State* ls, const std::string& name, c
 			throw LuaException("A value returned by " + name + " is not a valid number");
 		}
 	}
-	lua_pop(ls, n_out);
-	return out;
+	lua_pop(ls, n_out);*/
+	
+	double result = lua_tonumber(ls, -1);
+	lua_pop(ls, 1);
+	
+	return result;
 }
 
 double lua::get_number(lua_State* ls, const std::string& name) {

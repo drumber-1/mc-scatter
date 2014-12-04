@@ -22,9 +22,9 @@ Grid FileIOLua::read_file(std::string filename, const GridParameters& grid_param
 	for (int i = 0; i < grid_parameters.ncells[0]; i++) {
 		for (int j = 0; j < grid_parameters.ncells[1]; j++) {
 			for (int k = 0; k < grid_parameters.ncells[2]; k++) {
-				std::vector<int> cell = {i, j, k};
-				std::vector<double> pos = grid.get_position(cell);
-				double rho = lua::call_function(ls, "get_density", pos);
+				Point cell = {{i, j, k}};
+				Position pos = grid.get_position(cell);
+				double rho = lua::call_function(ls, "get_density", {pos[0], pos[1], pos[2]});
 				grid.set_rho(cell, rho);
 			}
 		}
