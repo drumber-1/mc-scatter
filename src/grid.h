@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GRID
+#define GRID
 
 #include <string>
 #include <vector>
@@ -42,3 +43,4 @@ class Grid {
 		void set_opacity(double opac);
 };
 
+#endif
