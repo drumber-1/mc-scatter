@@ -19,7 +19,6 @@ class LuaException : public std::runtime_error {
 
 namespace lua {
 	lua_State* open_file(const std::string& filename);
-	double call_function(lua_State* ls, const std::string& name, const std::initializer_list<double>& params);
 	double get_number(lua_State* ls, const std::string& name);
 	std::string get_string(lua_State* ls, const std::string& name);
 	std::vector<double> get_number_table(lua_State* ls, const std::string& name);
