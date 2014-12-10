@@ -10,15 +10,15 @@ using Position = std::array<double, 3>;
 
 class GridParameters {
 	public:
-		int ncells[3];
-		double left_boundary[3];
-		double right_boundary[3];
+		std::array<int, 3> ncells;
+		std::array<double, 3> left_boundary;
+		std::array<double, 3> right_boundary;
 };
 
 class Grid {
 		GridParameters parameters;
 		std::vector<double> rho_data;
-		double spacing[3];
+		std::array<double, 3> spacing;
 		bool empty;
 		double albedo, opacity;
 		inline int get_index(int i, int j, int k) const;

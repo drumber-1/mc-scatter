@@ -2,21 +2,21 @@
 #define IMAGE
 
 #include <string>
-#include <list>
+#include <array>
 #include "grid.h"
 
 class ImageParameters {
 	public:
-		int npixels[2];
-		double left_boundary[2];
-		double right_boundary[2];
+		std::array<int, 2> npixels;
+		std::array<double, 2> left_boundary;
+		std::array<double, 2> right_boundary;
 };
 
 class Image {
 		double obs_theta, obs_phi; //Observer Direction
 		int id;
 		ImageParameters parameters;
-		double image_pixel_spacing[2];
+		std::array<double, 2> image_pixel_spacing;
 		double **image;
 		void init(double theta, double phi, const ImageParameters& gp);
 		std::string construct_filename(std::string dir, std::string prefix, bool global);
