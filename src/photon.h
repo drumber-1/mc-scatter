@@ -1,10 +1,10 @@
 #pragma once
 
-#include <vector>
+#include <array>
 #include "grid.h"
 
 class Photon {
-		std::vector<double> dir; //Normalized direction vectors
+		std::array<double, 3> dir; //Normalized direction vectors
 		double tau_target; //Total optical depth this photon will travel before interacting
 		double tau_cur; //Total integrated optical depth so far
 		void move(double);
@@ -12,7 +12,7 @@ class Photon {
 		void scatter();
 		void init(double, double, double, double, double, bool);
 	public:
-		std::vector<double> pos;
+		Position pos;
 		int nScatt;
 		bool absorbed, escaped, scattered;
 		bool is_scan; //A scanning photon will never interact

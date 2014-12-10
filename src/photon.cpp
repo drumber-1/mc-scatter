@@ -5,7 +5,7 @@
 #include "random.h"
 #include "grid.h"
 
-std::vector<double> get_direction(double theta, double phi);
+std::array<double, 3> get_direction(double theta, double phi);
 
 extern void dispose();
 
@@ -21,10 +21,7 @@ Photon::Photon(double x, double y, double z, double ang1, double ang2, bool scan
 }
 
 void Photon::init(double x, double y, double z, double ang1, double ang2, bool scan) {
-	pos = std::vector<double>(3);
-	pos[0] = x;
-	pos[1] = y;
-	pos[2] = z;
+	pos = {{x, y, z}};
 	nScatt = 0;
 	if (scan) {
 		tau_target = 1.0e99;
@@ -56,9 +53,9 @@ void Photon::scatter() {
 void Photon::update(const Grid& grid) {
 	scattered = false;
 	
-	std::vector<int> cell = grid.get_cell(pos); //Cell containing photon
+	Point cell = grid.get_cell(pos); //Cell containing photon
 	
-	std::vector<int> next_cell(3); //x y and z cell faces that the photon will pass next
+	Point next_cell; //x y and z cell faces that the photon will pass next
 	for (int i = 0; i < 3; i++) {
 		//If moving in positive direction, we want the face above
 		if (dir[i] > 0) { 
@@ -68,9 +65,9 @@ void Photon::update(const Grid& grid) {
 		}
 	}
 	
-	std::vector<double> next_face = grid.get_position(next_cell); //x y and z faces, In physical space, that the photon will pass next for each axis
-	std::vector<double> next_face_dist(3); //Distance, along photon path to that face
-	std::vector<double> midpoint(3); //Coordinate of mid point from current position to face that photon will hit, using this instead of photon position avoids ambiguity is starting on face
+	Position next_face = grid.get_position(next_cell); //x y and z faces, In physical space, that the photon will pass next for each axis
+	std::array<double, 3> next_face_dist; //Distance, along photon path to that face
+	Position midpoint; //Coordinate of mid point from current position to face that photon will hit, using this instead of photon position avoids ambiguity is starting on face
 	
 	for (int i = 0; i < 3; i++) {
 		next_face_dist[i] = 1e99;
@@ -164,10 +161,9 @@ double Photon::get_tau_cur() {
 	return tau_cur;
 }
 
-std::vector<double> get_direction(double theta, double phi) {
-	std::vector<double> direction(3);
-	direction[0] = cos(theta) * cos(phi);
-	direction[1] = sin(theta) * cos(phi);
-	direction[2] = sin(phi);
+std::array<double, 3> get_direction(double theta, double phi) {
+	std::array<double, 3> direction = {{cos(theta) * cos(phi),
+	                                    sin(theta) * cos(phi),
+	                                    sin(phi)}};
 	return direction;
 }

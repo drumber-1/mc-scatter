@@ -31,85 +31,27 @@ Grid::Grid(const GridParameters& gp) : empty(false) {
 		spacing[i] = (parameters.right_boundary[i] - parameters.left_boundary[i]) / parameters.ncells[i];
 	}
 	
-	rho_data = new double **[parameters.ncells[0]];
+	int total_cells = parameters.ncells[0]*parameters.ncells[1]*parameters.ncells[2];
+	rho_data.resize(total_cells, 0);
 	
-	for (int i = 0; i < parameters.ncells[0]; i++) {
-		rho_data[i] = new double *[parameters.ncells[1]];
-	}
-	
-	for (int i = 0; i < parameters.ncells[0]; i++) {
-		for (int j = 0; j < parameters.ncells[1]; j++) {
-			rho_data[i][j] = new double [parameters.ncells[2]];
-		}
-	}
-	
-	for (int i = 0; i < parameters.ncells[0]; i++) {
-		for (int j = 0; j < parameters.ncells[1]; j++) {
-			for (int k = 0; k < parameters.ncells[2]; k++) {
-				rho_data[i][j][k] = 0;
-			}
-		}
-	}
 	albedo = 1.0;
 	opacity = 1.0;
 	
 }
 
-Grid::Grid(const Grid& other) {
-	init(other);
+//This ordering minimises cache misses when k is the inner loop
+inline int Grid::get_index(int i, int j, int k) const {
+	return k + j*parameters.ncells[2] + i*parameters.ncells[2]*parameters.ncells[1];
 }
 
-Grid& Grid::operator=(const Grid& other) {
-	init(other);
-	return *this;
+inline int Grid::get_index(const Point& cell) const {
+	return get_index(cell[0], cell[1], cell[2]);
 }
 
-Grid::~Grid() {
-	clear();
-}
-
-void Grid::init(const Grid& other) {
-	parameters = GridParameters(other.parameters);
-	empty = other.empty;
-	
-	for (int i = 0; i < 3; i++) {
-		spacing[i] = (parameters.right_boundary[i] - parameters.left_boundary[i]) / parameters.ncells[i];
-	}
-	
-	rho_data = new double **[parameters.ncells[0]];
-	
-	for (int i = 0; i < parameters.ncells[0]; i++) {
-		rho_data[i] = new double *[parameters.ncells[1]];
-	}
-	
-	for (int i = 0; i < parameters.ncells[0]; i++) {
-		for (int j = 0; j < parameters.ncells[1]; j++) {
-			rho_data[i][j] = new double [parameters.ncells[2]];
-		}
-	}
-	
-	for (int i = 0; i < parameters.ncells[0]; i++) {
-		for (int j = 0; j < parameters.ncells[1]; j++) {
-			for (int k = 0; k < parameters.ncells[2]; k++) {
-				rho_data[i][j][k] = other.rho_data[i][j][k];
-			}
-		}
-	}
-}
 
 void Grid::clear() {
-	for (int i = 0; i < parameters.ncells[0]; i++) {
-		for (int j = 0; j < parameters.ncells[1]; j++) {
-			delete rho_data[i][j];
-		}
-	}
-	
-	for (int i = 0; i < parameters.ncells[0]; i++) {
-		delete rho_data[i];
-	}
-	
-	delete rho_data;
-	rho_data = nullptr;
+
+	rho_data.resize(0.0, 0);
 	
 	for (int i = 0; i < 3; i++) {
 		parameters.ncells[i] = 0;
@@ -157,11 +99,11 @@ void Grid::output_slices(std::string data_location, unsigned int sliced_dim) con
 				for (int k = 0; k < parameters.ncells[unsliced_dim2]; k++) {
 					double rho = 0;
 					if (sliced_dim == 0) {
-						rho = rho_data[i][j][k];
+						rho = rho_data[get_index(i, j, k)];
 					} else if (sliced_dim == 1) {
-						rho = rho_data[k][i][j];
+						rho = rho_data[get_index(k, i, j)];
 					} else {
-						rho = rho_data[j][k][i];
+						rho = rho_data[get_index(j, k, i)];
 					}
 					fout << j << "\t" << k << "\t" << rho << std::endl;
 				}
@@ -187,7 +129,7 @@ void Grid::print_info() const {
 	}
 }
 
-bool Grid::is_on_grid(const std::vector<double>& pos) const {
+bool Grid::is_on_grid(const Position& pos) const {
 	if (pos[0] <= parameters.left_boundary[0] ||
 	    pos[1] <= parameters.left_boundary[1] ||
 	    pos[2] <= parameters.left_boundary[2] ||
@@ -200,7 +142,7 @@ bool Grid::is_on_grid(const std::vector<double>& pos) const {
 	}
 }
 
-bool Grid::is_on_grid(const std::vector<int>& cell) const {
+bool Grid::is_on_grid(const Point& cell) const {
 	if (cell[0] < 0 ||
 	    cell[1] < 0 ||
 	    cell[2] < 0 ||
@@ -213,38 +155,36 @@ bool Grid::is_on_grid(const std::vector<int>& cell) const {
 	}
 }
 
-std::vector<double> Grid::get_position(const std::vector<int>& cell) const {
-	std::vector<double> pos(3);
-	for (int i = 0; i < 3; i++) {
-		pos[i] = cell[i] * spacing[i] + parameters.left_boundary[i];
-	}
+Position Grid::get_position(const Point& cell) const {
+	Position pos = {{cell[0] * spacing[0] + parameters.left_boundary[0],
+	                 cell[1] * spacing[1] + parameters.left_boundary[1],
+	                 cell[2] * spacing[2] + parameters.left_boundary[2]}};
 	return pos;
 }
 
-std::vector<int> Grid::get_cell(const std::vector<double>& pos) const {
-	std::vector<int> cell(3);
-	for (int i = 0; i < 3; i++) {
-		cell[i] = floor((pos[i] - parameters.left_boundary[i]) / spacing[i]);
-	}
+Point Grid::get_cell(const Position& pos) const {
+	Point cell = {{(int)floor((pos[0] - parameters.left_boundary[0]) / spacing[0]),
+	               (int)floor((pos[1] - parameters.left_boundary[1]) / spacing[1]),
+	               (int)floor((pos[2] - parameters.left_boundary[2]) / spacing[2])}};
 	return cell;
 }
 
-double Grid::get_rho(const std::vector<double>& pos) const {
-	std::vector<int> cell = get_cell(pos);
+double Grid::get_rho(const Position& pos) const {
+	Point cell = get_cell(pos);
 	return get_rho(cell);
 }
 
-double Grid::get_rho(const std::vector<int>& cell) const {
+double Grid::get_rho(const Point& cell) const {
 	if (is_on_grid(cell)) {
-		return rho_data[cell[0]][cell[1]][cell[2]];
+		return rho_data[get_index(cell)];
 	} else {
 		return 0.0;
 	}
 }
 
-void Grid::set_rho(const std::vector<int>& cell, double rho) {
+void Grid::set_rho(const Point& cell, double rho) {
 	if (is_on_grid(cell)) {
-		rho_data[cell[0]][cell[1]][cell[2]] = rho;
+		rho_data[get_index(cell)] = rho;
 	}
 }
 
