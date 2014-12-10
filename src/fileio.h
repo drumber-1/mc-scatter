@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FILEIO
+#define FILEIO
 
 #include <string>
 #include <unordered_map>
@@ -17,3 +18,5 @@ class FileIOInterface {
 		virtual Grid read_file(std::string, const GridParameters&) = 0; //TODO: Check compiler is optimizing out copying on return
 		virtual void write_file(std::string, const Grid&) = 0;
 };
+
+#endif

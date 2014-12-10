@@ -1,5 +1,5 @@
 #include <string>
-#include <vector>
+#include <initializer_list>
 
 extern "C" {
 	#include <lua.h>
@@ -16,15 +16,6 @@ lua_State* lua::open_file(const std::string& filename) {
 		throw LuaException(filename + " is not a valid lua file");
 	}
 	return ls;
-}
-
-std::vector<double> lua::call_function(lua_State* ls, const std::string& name, const std::vector<double>& params, int n_out) {
-	lua_getglobal(ls, name.c_str());
-	if (!lua_isfunction(ls, -1)) {
-		throw LuaException(name + " does not reference a valid number");
-	}
-	std::vector<double> x = {0,0,0};
-	return x;
 }
 
 double lua::get_number(lua_State* ls, const std::string& name) {

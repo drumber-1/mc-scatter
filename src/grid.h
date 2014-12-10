@@ -1,38 +1,44 @@
-#pragma once
+#ifndef GRID
+#define GRID
 
 #include <string>
 #include <vector>
+#include <array>
+
+using Point = std::array<int, 3>;
+using Position = std::array<double, 3>;
 
 class GridParameters {
 	public:
-		int ncells[3];
-		double left_boundary[3];
-		double right_boundary[3];
+		std::array<int, 3> ncells;
+		std::array<double, 3> left_boundary;
+		std::array<double, 3> right_boundary;
 };
 
 class Grid {
 		GridParameters parameters;
-		double ***rho_data;
-		double spacing[3];
+		std::vector<double> rho_data;
+		std::array<double, 3> spacing;
 		bool empty;
 		double albedo, opacity;
-		void init(const Grid& other);
+		inline int get_index(int i, int j, int k) const;
+		inline int get_index(const Point& cell) const;
 	public:
 		Grid(const GridParameters&);
 		Grid();
-		~Grid();
-		Grid(const Grid&);
-		Grid& operator=(const Grid& other);
+		
 		void clear();
 		void output_slices(std::string, unsigned int) const;
 		void print_info() const;
-		bool is_on_grid(const std::vector<double>&) const;
-		bool is_on_grid(const std::vector<int>&) const;
-		std::vector<double> get_position(const std::vector<int>&) const;
-		std::vector<int> get_cell(const std::vector<double>&) const;
-		double get_rho(const std::vector<double>&) const;
-		double get_rho(const std::vector<int>&) const;
-		void set_rho(const std::vector<int>&, double rho);
+		
+		bool is_on_grid(const Position& pos) const;
+		bool is_on_grid(const Point& cell) const;
+		Position get_position(const Point& cell) const;
+		Point get_cell(const Position& pos) const;
+		double get_rho(const Position& pos) const;
+		double get_rho(const Point& cell) const;
+		void set_rho(const Point& cell, double rho);
+		
 		double get_spacing(int dim) const;
 		bool is_empty() const;
 		GridParameters get_parameters() const;
@@ -42,3 +48,4 @@ class Grid {
 		void set_opacity(double opac);
 };
 
+#endif

@@ -5,19 +5,19 @@
 #include "lua.h"
 #include "log.h"
 
+void set_number(lua_State* ls, const std::string& name, double& number);
+void set_string(lua_State* ls, const std::string& name, std::string& str);
+template<typename T, size_t SIZE>
+void set_number_table(lua_State* ls, const std::string& name, std::array<T, SIZE>& table);
+
+
 Config::Config() {
 	set_defaults();
 }
 
 Config::Config(const std::string& lua_file) {
 	set_defaults();
-	try {
-		set_lua(lua_file);
-	} catch (LuaException& e) {
-		logs::err << e.what() << ", using defaults\n";
-		set_defaults();
-		return;
-	}
+	set_lua(lua_file);
 }
 
 void Config::print() const {
@@ -44,7 +44,7 @@ void Config::set_defaults() {
 	
 	grid_limits = GridParameters();
 	for (int i = 0; i < 3; i++) {
-		grid_limits.ncells[i] = 500;
+		grid_limits.ncells[i] = 100;
 		grid_limits.left_boundary[i] = 0.0;
 		grid_limits.right_boundary[i] = 0.0;
 	}
@@ -59,31 +59,58 @@ void Config::set_defaults() {
 
 void Config::set_lua(const std::string& lua_file) {
 	lua_State* ls;
-	ls = lua::open_file(lua_file);
-
-	data_location = lua::get_string(ls, "data_location");
-	colden_location = lua::get_string(ls, "colden_location");
-	scatter_location = lua::get_string(ls, "scatter_location");
 	
-	std::vector<double> cells_vec = lua::get_number_table(ls, "grid_cells");
-	std::vector<double> grid_left_vec = lua::get_number_table(ls, "grid_left");
-	std::vector<double> grid_right_vec = lua::get_number_table(ls, "grid_right");
-	
-	std::vector<double> pixels_vec = lua::get_number_table(ls, "image_pixels");
-	std::vector<double> image_left_vec = lua::get_number_table(ls, "image_left");
-	std::vector<double> image_right_vec = lua::get_number_table(ls, "image_right");
-	
-	for (int i = 0; i < 3; i++) {
-		grid_limits.ncells[i] = cells_vec[i];
-		grid_limits.left_boundary[i] = grid_left_vec[i];
-		grid_limits.right_boundary[i] = grid_right_vec[i];
+	try {
+		ls = lua::open_file(lua_file);
+	} catch (LuaException& e) {
+		logs::err << e.what() << ", config unchanged\n";
+		return;
 	}
+
+	set_string(ls, "data_location", data_location);
+	set_string(ls, "colden_location", colden_location);
+	set_string(ls, "scatter_location", scatter_location);
 	
-	for (int i = 0; i < 2; i++) {
-		image_size.npixels[i] = pixels_vec[i];
-		image_size.left_boundary[i] = image_left_vec[i];
-		image_size.right_boundary[i] = image_right_vec[i];
+	set_number_table(ls, "grid_cells", grid_limits.ncells);
+	set_number_table(ls, "grid_left", grid_limits.left_boundary);
+	set_number_table(ls, "grid_right", grid_limits.right_boundary);
+	
+	set_number_table(ls, "image_pixels", image_size.npixels);
+	set_number_table(ls, "image_left", image_size.left_boundary);
+	set_number_table(ls, "image_right", image_size.right_boundary);
+}
+
+void set_number(lua_State* ls, const std::string& name, double& number) {
+	try {
+		number = lua::get_number(ls, name);
+	} catch (LuaException& e) {
+		logs::verbose << e.what() << ", variable not set\n";
+		return;
 	}
 }
 
+void set_string(lua_State* ls, const std::string& name, std::string& str) {
+	try {
+		str = lua::get_string(ls, name);
+	} catch (LuaException& e) {
+		logs::verbose << e.what() << ", variable not set\n";
+		return;
+	}
+}
+
+template<typename T, size_t SIZE>
+void set_number_table(lua_State* ls, const std::string& name, std::array<T, SIZE>& table) {
+	try {
+		std::vector<double> values = lua::get_number_table(ls, name);
+		if (values.size() != SIZE) {
+			throw LuaException(name + " is not " + std::to_string(SIZE) + " elements long");
+		}
+		for (int i = 0; i < SIZE; i++) {
+			table[i] = values[i];
+		}
+	} catch (LuaException& e) {
+		logs::verbose << e.what() << ", variable not set\n";
+		return;
+	}
+}	
 

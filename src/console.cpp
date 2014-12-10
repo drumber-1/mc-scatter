@@ -18,6 +18,12 @@ Console::Console(std::string inital_prompt) : prompt(inital_prompt), command_map
 	rl_attempted_completion_function = &Console::get_command_completions;
 	
 	//Hardcoded commands:
+	
+	//An alias for quit
+	command_map["q"] = [this](const std::vector<std::string>& input) {
+		return ReturnCode::Exit;
+	};
+	
 	//Help command - prints a list of the available commands
 	command_map["help"] = [this](const std::vector<std::string>& input) {
 		std::vector<std::string> commands = get_commands();

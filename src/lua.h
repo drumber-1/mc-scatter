@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <initializer_list>
 #include <stdexcept>
 
 extern "C" {
@@ -18,7 +19,6 @@ class LuaException : public std::runtime_error {
 
 namespace lua {
 	lua_State* open_file(const std::string& filename);
-	std::vector<double> call_function(lua_State* ls, const std::string& name, const std::vector<double>& params, int n_out);
 	double get_number(lua_State* ls, const std::string& name);
 	std::string get_string(lua_State* ls, const std::string& name);
 	std::vector<double> get_number_table(lua_State* ls, const std::string& name);

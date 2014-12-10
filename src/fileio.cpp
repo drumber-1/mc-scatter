@@ -2,14 +2,17 @@
 #include <string>
 #include <unordered_map>
 #include <memory>
+
 #include "para.h"
 #include "fileio.h"
 #include "fileio_mg.h"
+#include "fileio_lua.h"
 
 std::unordered_map<std::string, std::unique_ptr<FileIOInterface>> FileIOInterface::fileio_map;
 
 void FileIOInterface::init() {
 	fileio_map["mg"] = std::unique_ptr<FileIOMG>(new FileIOMG);
+	fileio_map["lua"] = std::unique_ptr<FileIOLua>(new FileIOLua);
 }
 
 bool FileIOInterface::file_type_supported(std::string filetype) {
