@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PHOTON
+#define PHOTON
 
 #include <array>
 #include "grid.h"
@@ -23,3 +24,5 @@ class Photon {
 		Photon peel(double, double);
 		double get_tau_cur();
 };
+
+#endif

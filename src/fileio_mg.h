@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FILEIOMG
+#define FILEIOMG
 
 #include <string>
 
@@ -10,3 +11,5 @@ class FileIOMG : public FileIOInterface {
 		Grid read_file(std::string, const GridParameters&);
 		void write_file(std::string, const Grid&);
 };
+
+#endif
