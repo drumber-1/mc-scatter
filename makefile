@@ -6,7 +6,7 @@ BINDIR = ./bin
 SRCDIR = ./src
 BUILDDIR = ./build
 
-OBJS_NAMES = main.o para.o random.o grid.o photon.o image.o util.o fileio.o fileio_mg.o fileio_lua.o console.o mcscatter.o commands.o log.o lua.o config.o
+OBJS_NAMES = main.o para.o random.o grid.o photon.o image.o util.o fileio.o fileio_mg.o fileio_lua.o console.o mcscatter.o commands.o log.o lua.o config.o command.o
 OBJS = $(addprefix $(BUILDDIR)/, $(OBJS_NAMES))
 
 all: CPPFLAGS += -O2
