@@ -34,7 +34,6 @@ Grid FileIOLua::read_file(std::string filename, const GridParameters& grid_param
 				double rho = lua_tonumber(ls, -1);
 				lua_pop(ls, 1);
 				
-				//double rho = lua::call_function(ls, "get_density", {pos[0], pos[1], pos[2]});
 				grid.set_rho(cell, rho);
 			}
 		}
