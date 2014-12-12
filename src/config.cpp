@@ -98,6 +98,8 @@ void set_string(lua_State* ls, const std::string& name, std::string& str) {
 	}
 }
 
+
+//Note, a double must be able to be cast into T
 template<typename T, size_t SIZE>
 void set_number_table(lua_State* ls, const std::string& name, std::array<T, SIZE>& table) {
 	try {
