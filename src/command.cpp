@@ -1,4 +1,5 @@
 #include <string>
+#include <cassert>
 
 #include "command.h"
 #include "log.h"
@@ -13,7 +14,7 @@ Command::ReturnCode Command::call(const std::vector<std::string>& input) {
 		print_usage();
 		return ReturnCode::Error;
 	}
-	cmd_function(input);
+	cmd_function(parse_arguments(input));
 	return ReturnCode::Good;
 }
 
@@ -35,4 +36,17 @@ void Command::print_help() {
 	for (auto arg : required_arguments) {
 		logs::out << arg.name << "\t" << arg.description;
 	}
+}
+
+Command::ArgumentMap Command::parse_arguments(const std::vector<std::string> & input) {
+	
+	//This should be guaranteed by Command::call
+	assert (input.size() == required_arguments.size()); 
+	
+	ArgumentMap map;
+	for (unsigned int i = 0; i < input.size(); i++) {
+		map[required_arguments[i].name] = input[i];
+	}
+	
+	return map;
 }

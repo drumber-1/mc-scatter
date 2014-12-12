@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <unordered_map>
 
 class CommandArgument {
 	public:
@@ -11,16 +12,18 @@ class CommandArgument {
 
 class Command {
 	public:
-	
 		enum ReturnCode {
 			Exit = -1,
 			Good = 0,
 			Error = 1
 		};
-	
-		//A command function accepts a vector of strings as its arguments, and represents a single command
-		using CommandFunction = std::function<ReturnCode(const std::vector<std::string> &)>;
 		
+		//Maps names of arguments to their values
+		using ArgumentMap = std::unordered_map<std::string, std::string>;
+	
+		//The function that determines the behaviour of the command
+		using CommandFunction = std::function<ReturnCode(ArgumentMap)>;
+
 		Command(std::string name, CommandFunction function);
 		
 		ReturnCode call(const std::vector<std::string>& input);
@@ -28,9 +31,12 @@ class Command {
 		void print_help();
 		
 	private:
+	
 		std::string cmd_name;
 		std::string description = "";
 		CommandFunction cmd_function;
 		std::vector<CommandArgument> required_arguments;
+		
+		ArgumentMap parse_arguments(const std::vector<std::string> &);
 		
 };
