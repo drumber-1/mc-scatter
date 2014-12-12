@@ -105,7 +105,7 @@ void set_number_table(lua_State* ls, const std::string& name, std::array<T, SIZE
 		if (values.size() != SIZE) {
 			throw LuaException(name + " is not " + std::to_string(SIZE) + " elements long");
 		}
-		for (int i = 0; i < SIZE; i++) {
+		for (unsigned int i = 0; i < SIZE; i++) {
 			table[i] = values[i];
 		}
 	} catch (LuaException& e) {
