@@ -2,7 +2,7 @@
 #include "mcscatter.h"
 #include "console.h"
 #include "random.h"
-#include "commands.h"
+#include "command.h"
 #include "fileio.h"
 #include "log.h"
 #include "lua.h"
@@ -14,14 +14,14 @@ int main(int argc, char *argv[]) {
 
 	para::init_para(argc, argv);
 	random_gen::init();
-	commands::init();
+	//commands::init();
 	FileIOInterface::init();
 	MCScatter::init();
 	
-	Console::ReturnCode return_code = Console::ReturnCode::Exit;
+	Command::ReturnCode return_code = Command::ReturnCode::Exit;
 	do {
 		return_code = Console::get_instance().read_line();
-	} while (return_code != Console::ReturnCode::Exit);
+	} while (return_code != Command::ReturnCode::Exit);
 	
 	dispose();
 	return 0;

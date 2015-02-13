@@ -7,50 +7,47 @@
 #include <cstdlib>
 #include <readline/readline.h>
 #include <readline/history.h>
+
 #include "console.h"
+#include "command.h"
 #include "para.h"
 #include "log.h"
 #include "lua.h"
 
-Console::Console(std::string inital_prompt) : prompt(inital_prompt), command_map({ {"quit",{}}, {"exit",{}} }) {
+Console::Console(std::string inital_prompt) : prompt(inital_prompt) {
 	
 	//Set custom completor
 	rl_attempted_completion_function = &Console::get_command_completions;
 	
 	//Hardcoded commands:
-	
-	//An alias for quit
-	command_map["q"] = [this](const std::vector<std::string>& input) {
-		return ReturnCode::Exit;
-	};
-	
-	//Help command - prints a list of the available commands
-	command_map["help"] = [this](const std::vector<std::string>& input) {
-		std::vector<std::string> commands = get_commands();
+	register_command("help", "Prints a list of commands", 
+	[this](Command::ArgumentMap args) {
+		std::vector<std::string> cmds = get_commands();
 		logs::out << "Valid commands are:\n";
-		for (auto& cmd : commands) {
+		for (auto& cmd : cmds) {
 			logs::out << "\t" << cmd << "\n";
 		}
-		return ReturnCode::Good;
-	};
+		return Command::ReturnCode::Good;
+	});
 	
-	//Run command - executes all commands in a given file
-	command_map["run"] = [this](const std::vector<std::string>& input) {
-		if (input.size() < 2) {
-			logs::err << "Usage: " << input[0] << " <script name>\n";
-			return ReturnCode::Error;
-		}
-		return run_script(input[1]);
-	};
+	register_command("exit", "Exit mc-scatter", 
+	[this](Command::ArgumentMap args) {
+		return Command::ReturnCode::Exit;
+	});
 	
-	//Run lua command - executes all commands in the "command" table
-	command_map["runlua"] = [this](const std::vector<std::string>& input) {
-		if (input.size() < 2) {
-			logs::err << "Usage: " << input[0] << " <script name>\n";
-			return ReturnCode::Error;
-		}
-		return run_lua_script(input[1]);
-	};
+	Command cmd_run("run", "Executes all commands, line by line, in a given file", 
+	[this](Command::ArgumentMap args) {
+		return run_script(args["filename"]);
+	});
+	cmd_run.add_argument("filename", "Name of the file to be run");
+	register_command(cmd_run);
+	
+	Command cmd_runlua("runlua", "Executes all command in the \"command\" table of a lua script", 
+	[this](Command::ArgumentMap args) {
+		return run_lua_script(args["filename"]);
+	});
+	cmd_runlua.add_argument("filename", "Name of the lua script");
+	register_command(cmd_runlua);
 }
 
 Console::~Console() {
@@ -61,8 +58,15 @@ Console& Console::get_instance() {
 	return instance;
 }
 
-void Console::register_command(const std::string& cmd, CommandFunction function) {
-	command_map[cmd] = function;
+void Console::register_command(const std::string& name,
+                               const std::string& description,
+                               const Command::CommandFunction& function) {
+    //It would be nice to use emplace here, but it does seem to work with g++ 4.7.2
+	register_command(Command(name, description, function));
+}
+
+void Console::register_command(const Command& cmd) {
+	command_map.insert(std::pair<std::string, Command>(cmd.name(), cmd));
 }
 
 std::vector<std::string> Console::get_commands() const {
@@ -73,41 +77,45 @@ std::vector<std::string> Console::get_commands() const {
 	return cmds;
 }
 
-Console::ReturnCode Console::run_command(const std::string& command) {
-	std::vector<std::string> inputs;
+Command::ReturnCode Console::run_command(const std::string& raw_input) {
+	std::vector<std::string> split_input;
 	
 	//Split command up by whitespace
-	std::istringstream iss(command);
+	std::istringstream iss(raw_input);
 	std::copy(std::istream_iterator<std::string>(iss),
 	          std::istream_iterator<std::string>(),
-	          std::back_inserter(inputs));
+	          std::back_inserter(split_input));
 	
-	if (inputs.size() == 0) {
-		return ReturnCode::Good;
+	if (split_input.size() == 0) {
+		return Command::ReturnCode::Good;
 	}
 
-	if (inputs[0] == "quit" || inputs[0] == "exit") {
-		return ReturnCode::Exit;
+	//Some hardcoded ways to quit the program
+	if (split_input[0] == "quit" || split_input[0] == "exit" || split_input[0] == "q") {
+		return Command::ReturnCode::Exit;
 	}
 	
-	CommandMap::iterator it = command_map.find(inputs[0]);
+	CommandMap::iterator it = command_map.find(split_input[0]);
 	if (it != end(command_map)) {
-		return (it->second)(inputs);
+		//Need to remove the name of the command from the split_input
+		std::vector<std::string>::const_iterator start = split_input.begin() + 1;
+		std::vector<std::string>::const_iterator end = split_input.end();
+		return (it->second).call(std::vector<std::string>(start, end)); //Call the function
 	}
 	
-	return ReturnCode::Good;
+	return Command::ReturnCode::Good;
 }
 
-Console::ReturnCode Console::run_script(const std::string& filename) {
+Command::ReturnCode Console::run_script(const std::string& filename) {
 	std::ifstream file_input(filename);
 	if (!file_input.good()) {
 		logs::err << "Could not open script: " << filename << "\n";
-		return ReturnCode::Error;
+		return Command::ReturnCode::Error;
 	}
 	
 	std::string command;
 	int counter = 0;
-	ReturnCode result;
+	Command::ReturnCode result;
 	
 	while (std::getline(file_input, command)) {
 		if (command[0] == '#') {
@@ -116,16 +124,16 @@ Console::ReturnCode Console::run_script(const std::string& filename) {
 		}
 		logs::out << "[" << counter << "] " << command << '\n';
 		result = run_command(command);
-		if (result != ReturnCode::Good) {
+		if (result != Command::ReturnCode::Good) {
 			return result;
 		}
 		counter++;
 	}
 	
-	return ReturnCode::Good; 
+	return Command::ReturnCode::Good; 
 }
 
-Console::ReturnCode Console::run_lua_script(const std::string& filename) {
+Command::ReturnCode Console::run_lua_script(const std::string& filename) {
 
 	lua_State* ls;
 	ls = lua::open_file(filename);
@@ -133,20 +141,20 @@ Console::ReturnCode Console::run_lua_script(const std::string& filename) {
 	std::vector<std::string> commands = lua::get_string_table(ls, "commands");
 	
 	int counter = 0;
-	ReturnCode result;
+	Command::ReturnCode result;
 	for (auto c : commands) {
 		logs::out << "[" << counter << "] " << c << '\n';
 		result = run_command(c);
-		if (result != ReturnCode::Good) {
+		if (result != Command::ReturnCode::Good) {
 			return result;
 		}
 		counter++;
 	}
 	
-	return ReturnCode::Good; 
+	return Command::ReturnCode::Good; 
 }
 
-Console::ReturnCode Console::read_line() {
+Command::ReturnCode Console::read_line() {
 	int input_bad = 0;
 	std::string line;
 	if (para::get_process_rank() == 0) {
@@ -167,7 +175,7 @@ Console::ReturnCode Console::read_line() {
 	para::broadcast(&input_bad);
 	
 	if (input_bad == 1) {
-		return ReturnCode::Exit;
+		return Command::ReturnCode::Exit;
 	}
 	
 	para::broadcast(line);
@@ -204,18 +212,4 @@ char* Console::command_iterator(const char* text, int state) {
 	
 	return nullptr;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

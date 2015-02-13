@@ -3,24 +3,20 @@
 #include <unordered_map>
 #include <functional>
 
+#include "command.h"
+
 class Console {
 	public:
-		enum ReturnCode {
-			Exit = -1,
-			Good = 0,
-			Error = 1
-		};
-		
-		//A command function accepts a vector of strings as its arguments, and represents a single command
-		using CommandFunction = std::function<ReturnCode(const std::vector<std::string> &)>;
 		
 		static Console& get_instance();
 		std::vector<std::string> get_commands() const;
-		void register_command(const std::string& cmd, CommandFunction function);
-		ReturnCode run_command(const std::string& command);
-		ReturnCode run_script(const std::string& filename);
-		ReturnCode run_lua_script(const std::string& filename);
-		ReturnCode read_line();
+		void register_command(const std::string& name, const std::string& description, const Command::CommandFunction& function);
+		void register_command(const Command& cmd);
+		Command::ReturnCode run_command(const std::string& command);
+		Command::ReturnCode run_script(const std::string& filename);
+		Command::ReturnCode run_lua_script(const std::string& filename);
+		Command::ReturnCode read_line();
+		Command::ReturnCode print_help();
 	private:
 		Console(std::string prompt);
 		~Console();
@@ -28,7 +24,7 @@ class Console {
 		void operator=(const Console&);		
 		
 		//Maps strings (taken from stdin from user) to the functions to execute
-		using CommandMap = std::unordered_map<std::string, CommandFunction>;
+		using CommandMap = std::unordered_map<std::string, Command>;
 		
 		//To interface with GNU readline
 		//They need to be static, as rl_completion_matches takes a function pointer
