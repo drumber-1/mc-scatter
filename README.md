@@ -40,9 +40,7 @@ Coordinates
 Thought the code, mc-scatter often refers to the angles theta and phi. These are defined as follows:
 
 Theta is the angle away from positive x, in the x-y plane.
-Phi is the angle out of the x-y plane. Phi = pi/2 points in the positive z direction, phi = -pi/2 points in the negative x direction
-
-So theta = phi = zero looks down the positive x axis at the YZ plane.
+phi is the angle out of the x-y plane: phi = pi/2 points in the positive z direction, phi = -pi/2 points in the negative z direction.
 
 
 Example images
